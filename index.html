@@ -110,14 +110,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 <div class="pg" id="pg-mensal"></div>
 <div class="pg" id="pg-categorias"></div>
 <div class="pg" id="pg-lancamentos"></div>
-<div class="pg" id="pg-investimentos"></div>
+
 <div class="pg" id="pg-atualizar"></div>
 </main>
 <div class="ft">Financeiro Familiar · Atualizado em <span id="ft-dt"></span></div>
 
 <script>
-const PAGES=['overview','mensal','categorias','lancamentos','investimentos','atualizar'];
-const LABELS=['Visão Geral','Por Mês','Categorias','Lançamentos','Investimentos','Atualizar Dados'];
+const PAGES=['overview','mensal','categorias','lancamentos','atualizar'];
+const LABELS=['Visão Geral','Por Mês','Categorias','Lançamentos','Atualizar Dados'];
 let curPage='overview';
 
 function showP(p){
@@ -416,43 +416,6 @@ function renderTx(){
   }).join('');
 }
 
-// ── INVESTIMENTOS ───────────────────────────────────────────────
-function buildInvestimentos(){
-  const inv=D.investimentos;
-  if(!inv){document.getElementById('pg-investimentos').innerHTML='<div class="sh" style="margin-top:1rem"><div class="st">Sem dados de investimento</div></div>';return}
-  const rm=inv.patrimonio*0.01;
-  const cm=D.meses.reduce((s,m)=>s+m.fixos.total+m.cartoes.total,0)/D.meses.length;
-
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Carteira XP</div><div class="ss">Referência: ${inv.data_ref}</div></div>`;
-  h+=`<div class="hero">
-    <div class="hc cb"><div class="hl">Patrimônio</div><div class="hv">${fK(inv.patrimonio)}</div></div>
-    <div class="hc ${inv.rentabilidade_mes>=0?'cg':'cr'}"><div class="hl">Rent. mês</div><div class="hv">${(inv.rentabilidade_mes>=0?'+':'')+inv.rentabilidade_mes.toFixed(2)}%</div></div>
-    <div class="hc ca"><div class="hl">Rent. 24M</div><div class="hv">+${inv.rentabilidade_24m.toFixed(2)}%</div></div>
-    <div class="hc cg"><div class="hl">Renda passiva est.</div><div class="hv">${fK(rm)}</div><div class="hs">~1%/mês</div></div>
-  </div>`;
-  h+=`<div class="g2">
-    <div class="cd"><div class="ct">Composição</div><div class="cw" style="height:200px"><canvas id="cComp"></canvas></div><div id="comp-leg" style="margin-top:10px"></div></div>
-    <div class="cd"><div class="ct">Renda passiva vs custo de vida</div>
-      <div class="sg">
-        <div class="si"><div class="sl">Custo total médio/mês</div><div class="sv">${fmt(cm)}</div></div>
-        <div class="si"><div class="sl">Renda passiva (~1%/mês)</div><div class="sv" style="color:var(--g)">${fmt(rm)}</div></div>
-        <div class="si"><div class="sl">Cobertura</div><div class="sv" style="color:var(--a)">${(rm/cm*100).toFixed(1)}%</div></div>
-        <div class="si"><div class="sl">Patrimônio p/ independência</div><div class="sv">~${fK(cm/0.01)}</div></div>
-      </div>
-    </div>
-  </div>`;
-  document.getElementById('pg-investimentos').innerHTML=h;
-
-  const cc=['#1A5C3A','#C8973A','#8B1A1A'];
-  new Chart(document.getElementById('cComp'),{
-    type:'doughnut',data:{labels:inv.composicao.map(c=>c.estrategia),datasets:[{data:inv.composicao.map(c=>c.valor),backgroundColor:cc,borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
-  });
-  document.getElementById('comp-leg').innerHTML=inv.composicao.map((c,i)=>
-    `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:${cc[i]};display:inline-block"></span>${c.estrategia}</span><span style="font-weight:500">${fK(c.valor)} <span style="color:var(--t3);font-weight:400">${c.pct}%</span></span></div>`
-  ).join('');
-}
-
 // ── ATUALIZAR DADOS ─────────────────────────────────────────────
 function buildAtualizar(){
   let h=`<div class="sh" style="margin-top:1rem"><div class="st">Atualizar dados</div><div class="ss">importe seu arquivo dados.json atualizado</div></div>`;
@@ -549,8 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
   buildMensal();
   buildCategorias();
   buildLancamentos();
-  buildInvestimentos();
-  buildAtualizar();
+    buildAtualizar();
 });
 </script>
 </body>
