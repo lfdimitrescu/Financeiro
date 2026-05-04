@@ -92,12 +92,12 @@ function verificarSenha(){
   }
 }
 // Checar se já autenticado nessa sessão
-if(sessionStorage.getItem('fin_auth')==='ok'){
-  document.addEventListener('DOMContentLoaded',()=>{
-    const ls = document.getElementById('login-screen');
-    if(ls) ls.style.display='none';
-  });
-}
+document.addEventListener('DOMContentLoaded',()=>{
+  const ls = document.getElementById('login-screen');
+  if(ls && sessionStorage.getItem('fin_auth')==='ok'){
+    ls.style.display='none';
+  }
+});
 </script>
 
 <nav>
@@ -281,7 +281,7 @@ function renderMes(i){
     </div></div>
     <div class="cd"><div class="ct">Fixos — ${m.mes}</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Valor</th></tr>
-      ${m.fixos.items.map(x=>`<tr><td style="${x.valor===0?'color:var(--t3)':''}">${x.nome}</td><td class="num" style="${x.valor===0?'color:var(--t3)':''}">${fmt(x.valor)}</td></tr>`).join('')}
+      ${m.fixos.items.slice().sort((a,b)=>b.valor-a.valor).map(x=>`<tr><td style="${x.valor===0?'color:var(--t3)':''}">${x.nome}</td><td class="num" style="${x.valor===0?'color:var(--t3)':''}">${fmt(x.valor)}</td></tr>`).join('')}
       <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(m.fixos.total)}</td></tr>
     </table></div>
   </div>`;
@@ -399,7 +399,6 @@ function applyStoredEdits(){
   if(Object.keys(edits).length===0)return;
   TX.forEach(t=>{if(edits[t.estab])t.cat=edits[t.estab];});
 }
-applyStoredEdits();
 function renderTx(){
   const q=(document.getElementById('tx-q')?.value||'').toLowerCase();
   let f=TX;
@@ -543,6 +542,7 @@ const DEFAULT_TX=[{"data":"21/04/2025","estab":"ASICS - LOJA BARRA10/10","cat":"
 // ── INIT ────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   loadData();
+  applyStoredEdits();
   document.getElementById('nav-dt').textContent='Atualizado em '+D.atualizado;
   document.getElementById('ft-dt').textContent=D.atualizado;
   buildOverview();
