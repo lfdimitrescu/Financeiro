@@ -183,6 +183,7 @@ async function carregarDados() {
   ]);
   const ordemMeses = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const normMes = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
+  console.log('Meses raw do banco:', (r1.data||[]).map(m=>m.mes));
   MESES = (r1.data || []).map(m=>({...m,mes:normMes(m.mes)})).sort((a,b) => ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes));
   const normMesTX = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
   TX = (r2.data || []).map(t => ({...t, mes: normMesTX(t.mes)}));
@@ -402,9 +403,8 @@ function renderMes(i){
 // ── CATEGORIAS ────────────────────────────────────────────────
 function buildCategorias() {
   const ordemM = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  // Usar nomes de meses diretamente das transações para garantir encoding idêntico
-  const mesesFromTX = [...new Set(TX.map(t=>t.mes))];
-  const mesesNomes = mesesFromTX.sort((a,b)=>ordemM.indexOf(a)-ordemM.indexOf(b));
+  // Usar ordem dos MESES (já normalizados ao carregar)
+  const mesesNomes = MESES.map(m=>m.mes);
   const catMap = {};
   TX.forEach(t=>{
     if(!catMap[t.categoria]) catMap[t.categoria]={total:0};
