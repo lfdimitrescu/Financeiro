@@ -400,12 +400,14 @@ function renderMes(i){
 // ── CATEGORIAS ────────────────────────────────────────────────
 function buildCategorias() {
   const ordemM = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const mesesNomes = MESES.map(m=>m.mes).sort((a,b)=>ordemM.indexOf(a)-ordemM.indexOf(b));
+  // Usar nomes de meses diretamente das transações para garantir encoding idêntico
+  const mesesFromTX = [...new Set(TX.map(t=>t.mes))];
+  const mesesNomes = mesesFromTX.sort((a,b)=>ordemM.indexOf(a)-ordemM.indexOf(b));
   const catMap = {};
   TX.forEach(t=>{
     if(!catMap[t.categoria]) catMap[t.categoria]={total:0};
-    mesesNomes.forEach(mn=>{if(!catMap[t.categoria][mn])catMap[t.categoria][mn]=0;});
-    catMap[t.categoria][t.mes]=(catMap[t.categoria][t.mes]||0)+parseFloat(t.valor);
+    if(!catMap[t.categoria][t.mes]) catMap[t.categoria][t.mes]=0;
+    catMap[t.categoria][t.mes]+=parseFloat(t.valor);
     catMap[t.categoria].total+=parseFloat(t.valor);
   });
   const cats=Object.entries(catMap).filter(([,v])=>v.total>0).sort((a,b)=>b[1].total-a[1].total);
