@@ -182,10 +182,12 @@ async function carregarDados() {
     sb.from('viagens').select('*').order('mes'),
   ]);
   const ordemMeses = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  MESES = (r1.data || []).map(m=>({...m,mes:m.mes.normalize('NFC')})).sort((a,b) => ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes));
-  TX = (r2.data || []).map(t => ({...t, mes: t.mes.normalize('NFC')}));
-  FIXOS = r3.data || [];
-  VIAGENS = r4.data || [];
+  const normMes = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
+  MESES = (r1.data || []).map(m=>({...m,mes:normMes(m.mes)})).sort((a,b) => ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes));
+  const normMesTX = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
+  TX = (r2.data || []).map(t => ({...t, mes: normMesTX(t.mes)}));
+  FIXOS = (r3.data || []).map(f=>({...f,mes:f.mes.normalize('NFC').replace('Março','Marco').replace(/^Mar.o$/i,'Marco')}));
+  VIAGENS = (r4.data || []).map(v=>({...v,mes:v.mes.normalize('NFC').replace('Março','Marco').replace(/^Mar.o$/i,'Marco')}));
   console.log(`Dados: ${MESES.length} meses, ${TX.length} tx, ${FIXOS.length} fixos`);
 }
 
