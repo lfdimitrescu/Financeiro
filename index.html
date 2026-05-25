@@ -177,7 +177,7 @@ function mostrarErro(msg) {
 async function carregarDados() {
   const [r1, r2, r3, r4] = await Promise.all([
     sb.from('meses').select('*').order('ano'),
-    sb.from('transacoes').select('*').order('mes').order('valor', {ascending: false}),
+    sb.from('transacoes').select('*').order('mes').order('valor', {ascending: false}).limit(2000),
     sb.from('fixos').select('*').order('mes').order('valor', {ascending: false}),
     sb.from('viagens').select('*').order('mes'),
   ]);
