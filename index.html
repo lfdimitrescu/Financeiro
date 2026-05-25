@@ -294,10 +294,62 @@ function buildOverview() {
 // ── MENSAL ────────────────────────────────────────────────────
 function buildMensal() {
   let h=`<div class="sh" style="margin-top:1rem"><div class="st">Resumo mensal</div></div>`;
-  h+=`<div class="ms" id="ms-sel">${MESES.map((m,i)=>`<button class="${i===0?'on':''}" onclick="selMes(${i},this)">${m.mes}</button>`).join('')}</div>`;
+  h+=`<div class="ms" id="ms-sel">${MESES.map((m,i)=>`<button class="${i===0?'on':''}" onclick="selMes(${i},this)">${m.mes}</button>`).join('')}<button onclick="selMesTotal(this)">Total</button></div>`;
   h+=`<div id="mes-detail"></div>`;
   document.getElementById('pg-mensal').innerHTML=h;
   renderMes(0);
+}
+function selMesTotal(btn){
+  document.querySelectorAll('#ms-sel button').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  renderMesTotal();
+}
+function renderMesTotal(){
+  const tR=MESES.reduce((s,m)=>s+parseFloat(m.rec_total||0),0);
+  const tC=MESES.reduce((s,m)=>s+parseFloat(m.cart_total||0),0);
+  const tF=MESES.reduce((s,m)=>s+parseFloat(m.fixos_total||0),0);
+  const tV=MESES.reduce((s,m)=>s+parseFloat(m.viagens_total||0),0);
+  const tS=MESES.reduce((s,m)=>s+parseFloat(m.saldo||0),0);
+  const tot=tC+tV+tF;
+  // Fixos agrupados
+  const fmap={};
+  FIXOS.forEach(f=>{if(+f.valor>0){if(!fmap[f.nome])fmap[f.nome]=0;fmap[f.nome]+=+f.valor;}});
+  const fixSorted=Object.entries(fmap).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  // Viagens agrupadas
+  const vmap={};
+  VIAGENS.forEach(v=>{if(!vmap[v.destino])vmap[v.destino]=0;vmap[v.destino]+=+v.valor;});
+  let h=`<div class="g2">
+    <div class="cd"><div class="ct">Receitas & Cartões — Total Anual</div><table>
+      <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
+      <tr><td>Salário</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_salario||0),0))}</td></tr>
+      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0)>0?`<tr><td>Dividendos</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0))}</td></tr>`:''}
+      <tr><td>PJ Andressa</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_pj_andressa||0),0))}</td></tr>
+      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0)>0?`<tr><td>Outros</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0))}</td></tr>`:''}
+      <tr class="tr"><td>Total Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
+    </table><hr><table>
+      <tr><td>Cartão Itaú</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_itau||0),0))}</td></tr>
+      <tr><td>Cartão XP</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_xp||0),0))}</td></tr>
+      <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(tC)}</td></tr>
+    </table>
+    ${Object.keys(vmap).length?`<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${Object.entries(vmap).sort((a,b)=>b[1]-a[1]).map(([d,v])=>`<tr><td>${d}</td><td class="num">${fmt(v)}</td></tr>`).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(tV)}</td></tr></table>`:''}
+    <hr>
+    <table style="margin-bottom:8px">
+      <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(tC)}</td></tr>
+      <tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(tV)}</td></tr>
+      <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(tF)}</td></tr>
+      <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
+      <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
+    </table>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <div><div class="hl">Saldo acumulado</div><div class="${tS>=0?'sp':'sn'}">${tS>=0?'+':''}${fmt(tS)}</div></div>
+    </div></div>
+    <div class="cd"><div class="ct">Fixos acumulados</div><table>
+      <tr><th>Descrição</th><th style="text-align:right">Total</th><th style="text-align:right">Média/mês</th></tr>
+      ${fixSorted.map(([n,v])=>`<tr><td>${n}</td><td class="num">${fmt(v)}</td><td class="num" style="color:var(--t3)">${fmt(v/MESES.length)}</td></tr>`).join('')}
+      <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(tF)}</td><td class="num neg" style="color:var(--t3)">${fmt(tF/MESES.length)}/mês</td></tr>
+    </table></div>
+  </div>`;
+  document.getElementById('mes-detail').innerHTML=h;
 }
 function selMes(i,btn){
   curMes=i;
@@ -325,9 +377,16 @@ function renderMes(i){
       <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(+m.cart_total)}</td></tr>
     </table>
     ${viaM.length?`<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${viaM.map(v=>`<tr><td>${v.destino}</td><td class="num">${fmt(+v.valor)}</td></tr>`).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(+m.viagens_total)}</td></tr></table>`:''}
-    <hr><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-      <div><div class="hl">Saldo</div><div class="${+m.saldo>=0?'sp':'sn'}">${+m.saldo>=0?'+':''}${fmt(+m.saldo)}</div></div>
-      <div style="text-align:right"><div class="hl">Despesas totais</div><div style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--r)">${fmt(tot)}</div></div>
+    <hr>
+    <table style="margin-bottom:8px">
+      <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(+m.cart_total)}</td></tr>
+      ${viaM.length?`<tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(+m.viagens_total)}</td></tr>`:''}
+      <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(+m.fixos_total)}</td></tr>
+      <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
+      <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
+    </table>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <div><div class="hl">Saldo do mês</div><div class="${+m.saldo>=0?'sp':'sn'}">${+m.saldo>=0?'+':''}${fmt(+m.saldo)}</div></div>
     </div></div>
     <div class="cd"><div class="ct">Fixos — ${m.mes}</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Valor</th></tr>
