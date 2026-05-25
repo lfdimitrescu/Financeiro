@@ -181,7 +181,7 @@ async function carregarDados() {
     sb.from('fixos').select('*').order('mes').order('valor', {ascending: false}),
     sb.from('viagens').select('*').order('mes'),
   ]);
-  const ordemMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const ordemMeses = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   MESES = (r1.data || []).map(m=>({...m,mes:m.mes.normalize('NFC')})).sort((a,b) => ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes));
   TX = (r2.data || []).map(t => ({...t, mes: t.mes.normalize('NFC')}));
   FIXOS = r3.data || [];
@@ -399,7 +399,7 @@ function renderMes(i){
 
 // ── CATEGORIAS ────────────────────────────────────────────────
 function buildCategorias() {
-  const ordemM = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const ordemM = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   // Usar nomes de meses diretamente das transações para garantir encoding idêntico
   const mesesFromTX = [...new Set(TX.map(t=>t.mes))];
   const mesesNomes = mesesFromTX.sort((a,b)=>ordemM.indexOf(a)-ordemM.indexOf(b));
