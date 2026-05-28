@@ -264,7 +264,8 @@ function buildOverview() {
     const cls=isSaldo||isDesp?'tr':'';
     const cells=vals.map(v=>{
       let c=''; if(isSaldo)c=v>=0?'pos':'neg'; if(isDesp)c='neg';
-      return `<td class="num ${c}" style="${isSub?'color:var(--t3);font-size:11px':''}">${fmt(v)}</td>`;
+      const prefix=isSaldo?(v>=0?'+':'-'):(isDesp?'':'')
+      return `<td class="num ${c}" style="${isSub?'color:var(--t3);font-size:11px':''}">${prefix}${fmt(v)}</td>`;
     }).join('');
     h+=`<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}</tr>`;
   });
@@ -387,7 +388,7 @@ function renderMes(i){
       <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
     </table>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-      <div><div class="hl">Saldo do mês</div><div class="${+m.saldo>=0?'sp':'sn'}">${+m.saldo>=0?'+':''}${fmt(+m.saldo)}</div></div>
+      <div><div class="hl">Saldo do mês</div><div class="${+m.saldo>=0?'sp':'sn'}">${+m.saldo>=0?'+':'-'}${fmt(+m.saldo)}</div></div>
     </div></div>
     <div class="cd"><div class="ct">Fixos — ${m.mes}</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Valor</th></tr>
