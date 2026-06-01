@@ -3,22 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Financeiro Familiar — 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Financeiro Familiar</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#F7F5F0;--s:#FFF;--s2:#F0EDE6;--bd:rgba(0,0,0,0.08);--t:#1A1814;--t2:#6B6760;--t3:#9B9894;--g:#1A5C3A;--gbg:#E8F5EE;--r:#8B1A1A;--rbg:#FAEAEA;--a:#7A4E0D;--abg:#FDF3E3;--bl:#0D3B6E;--blbg:#E8F1FB;--ac:#C8973A;--ac2:#1A3A2A;--rd:12px}
+:root{
+  --bg:#F7F5F0;--s:#FFF;--s2:#F0EDE6;--bd:rgba(0,0,0,0.08);
+  --t:#1A1814;--t2:#6B6760;--t3:#9B9894;
+  --g:#1A5C3A;--gbg:#E8F5EE;--r:#8B1A1A;--rbg:#FAEAEA;
+  --a:#7A4E0D;--abg:#FDF3E3;--bl:#0D3B6E;--blbg:#E8F1FB;
+  --ac:#C8973A;--ac2:#1A3A2A;--rd:12px
+}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:var(--ac2);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:var(--s);border-radius:20px;padding:2.5rem;width:360px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.4)}
+.login-logo{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--ac2);margin-bottom:4px}.login-logo span{color:var(--ac)}
+.login-sub{font-size:12px;color:var(--t3);margin-bottom:28px}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-bottom:10px;transition:.2s}
+.login-input:focus{border-color:var(--ac)}
+.login-btn{width:100%;padding:11px;background:var(--ac2);color:#F7F5F0;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:.2s}
+.login-btn:hover{background:#243f30}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-err{color:var(--r);font-size:12px;margin-top:8px;display:none}
+.login-user{font-size:11px;color:var(--t3);margin-top:16px}
+
+/* NAV */
 nav{background:var(--ac2);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
 .nb{font-family:'DM Serif Display',serif;font-size:1.15rem;color:#F7F5F0}.nb span{color:var(--ac)}
 .nt{display:flex;gap:4px;flex-wrap:wrap}
 .nt button{background:0;border:0;cursor:pointer;padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(247,245,240,.6);transition:.15s}
 .nt button:hover{color:#F7F5F0;background:rgba(255,255,255,.1)}
 .nt button.on{color:#F7F5F0;background:rgba(255,255,255,.15)}
-.nd{font-size:11px;color:rgba(247,245,240,.5)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-user{font-size:11px;color:rgba(247,245,240,.5)}
+.logout-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(247,245,240,.7);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.logout-btn:hover{background:rgba(255,255,255,.1)}
+
 main{max-width:1200px;margin:0 auto;padding:1.5rem 2rem}
 .pg{display:none}.pg.on{display:block}
+
+/* CARDS */
 .hero{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:1.5rem}
 .hc{background:var(--s);border:1px solid var(--bd);border-radius:var(--rd);padding:1.1rem;position:relative;overflow:hidden}
 .hc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
@@ -26,500 +54,451 @@ main{max-width:1200px;margin:0 auto;padding:1.5rem 2rem}
 .hl{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .hv{font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1}
 .hs{font-size:11px;color:var(--t2);margin-top:5px}
-.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
-.bg{background:var(--gbg);color:var(--g)}.br{background:var(--rbg);color:var(--r)}.ba{background:var(--abg);color:var(--a)}.bb{background:var(--blbg);color:var(--bl)}
+
 .sh{display:flex;align-items:baseline;gap:10px;margin:1.5rem 0 .8rem}
 .st{font-family:'DM Serif Display',serif;font-size:1.2rem}.ss{font-size:12px;color:var(--t3)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .cd{background:var(--s);border:1px solid var(--bd);border-radius:var(--rd);padding:1.25rem}
 .ct{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.8rem}
 .ms{display:flex;gap:6px;background:var(--s2);padding:3px;border-radius:8px;width:fit-content;margin-bottom:1rem}
 .ms button{background:0;border:0;cursor:pointer;padding:5px 16px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--t2);transition:.15s}
 .ms button:hover{color:var(--t)}.ms button.on{background:var(--s);color:var(--t);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{text-align:left;font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;padding:0 0 6px;border-bottom:1px solid var(--bd)}
 td{padding:7px 0;border-bottom:1px solid var(--bd)}.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
 .pos{color:var(--g)}.neg{color:var(--r)}
 tr.tr td{font-weight:600;border-top:1px solid var(--bd);padding-top:10px}
 .br-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px}
-.br-l{min-width:130px;color:var(--t2)}.br-t{flex:1;background:var(--s2);border-radius:3px;height:5px;overflow:hidden}
-.br-f{height:100%;border-radius:3px}.br-v{min-width:65px;text-align:right;font-weight:500}
+.br-l{min-width:140px;color:var(--t2)}.br-t{flex:1;background:var(--s2);border-radius:3px;height:5px;overflow:hidden}
+.br-f{height:100%;border-radius:3px}
+.sp{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--g)}
+.sn{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--r)}
 .cw{position:relative}
 hr{border:0;border-top:1px solid var(--bd);margin:.8rem 0}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.si{background:var(--s2);border-radius:8px;padding:10px 12px}
-.sl{font-size:10px;color:var(--t3);margin-bottom:3px}.sv{font-size:16px;font-weight:600}
-.sp,.sn{font-family:'DM Serif Display',serif;font-size:1.8rem}
-.sp{color:var(--g)}.sn{color:var(--r)}
-.upload-zone{border:2px dashed var(--bd);border-radius:var(--rd);padding:2rem;text-align:center;cursor:pointer;transition:.2s;margin-bottom:1rem}
-.upload-zone:hover{border-color:var(--ac);background:rgba(200,151,58,.05)}
-.upload-zone.drag{border-color:var(--ac);background:rgba(200,151,58,.1)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.bg{background:var(--gbg);color:var(--g)}.br2{background:var(--rbg);color:var(--r)}
+
+/* LANÇAMENTOS */
+.filter-row{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+.sel{padding:5px 12px;border:1px solid var(--bd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--s);color:var(--t)}
+.search-input{padding:5px 12px;border:1px solid var(--bd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;flex:1;min-width:180px;background:var(--s)}
+.cat-badge{background:var(--s2);padding:1px 6px;border-radius:4px;cursor:pointer;transition:.15s}
+.cat-badge:hover{background:#e0ddd6}
+.cat-sel{font-size:11px;padding:2px 4px;border:1px solid var(--bd);border-radius:4px;background:var(--s)}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A3A2A;color:#F7F5F0;padding:10px 20px;border-radius:8px;font-size:13px;z-index:10000;transition:opacity .3s;opacity:0;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+
+/* LOADING */
+.loading{text-align:center;padding:3rem;color:var(--t3);font-size:14px}
+
 .ft{text-align:center;padding:1.5rem;font-size:10px;color:var(--t3);margin-top:2rem}
-@media(max-width:768px){.hero{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}main{padding:1rem}.nd{display:none}}
+@media(max-width:768px){.hero{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}main{padding:1rem}}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:#1A3A2A;margin-bottom:6px">Financeiro <span style="color:#C8973A">Familiar</span></div>
-    <div style="font-size:12px;color:#9B9894;margin-bottom:24px">Acesso restrito</div>
-    <input type="password" id="senha-input" placeholder="Digite a senha" 
-      style="width:100%;padding:10px 14px;border:1px solid #E0DDD6;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-bottom:12px"
-      onkeydown="if(event.key==='Enter')verificarSenha()">
-    <button onclick="verificarSenha()" 
-      style="width:100%;padding:10px;background:#1A3A2A;color:#F7F5F0;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer">
-      Entrar
-    </button>
-    <div id="senha-erro" style="color:#8B1A1A;font-size:12px;margin-top:10px;display:none">Senha incorreta</div>
+    <div class="login-logo">Financeiro <span>Familiar</span></div>
+    <div class="login-sub">Acesso restrito à família Dimitrescu</div>
+    <input type="email" id="email-input" class="login-input" placeholder="seu@email.com" autocomplete="email">
+    <input type="password" id="pass-input" class="login-input" placeholder="Senha" onkeydown="if(event.key==='Enter')fazerLogin()">
+    <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
+    <div id="login-err" class="login-err"></div>
+    <div class="login-user">Acesso com seu email e senha cadastrados</div>
   </div>
 </div>
-<style>
-#login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:#1A3A2A;display:flex;align-items:center;justify-content:center;z-index:9999}
-.login-box{background:#FFF;border-radius:16px;padding:2.5rem;width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
-</style>
-<script>
-function verificarSenha(){
-  const s = document.getElementById('senha-input').value;
-  if(s === '13231525'){
-    document.getElementById('login-screen').style.display='none';
-    sessionStorage.setItem('fin_auth','ok');
-  } else {
-    document.getElementById('senha-erro').style.display='block';
-    document.getElementById('senha-input').value='';
-    document.getElementById('senha-input').focus();
-  }
-}
-// Checar se já autenticado nessa sessão
-document.addEventListener('DOMContentLoaded',()=>{
-  const ls = document.getElementById('login-screen');
-  if(ls && sessionStorage.getItem('fin_auth')==='ok'){
-    ls.style.display='none';
-  }
-});
-</script>
 
+<!-- NAV -->
 <nav>
-<div class="nb">Financeiro <span>Familiar</span></div>
-<div class="nt" id="tabs"></div>
-<div class="nd" id="nav-dt"></div>
+  <div class="nb">Financeiro <span>Familiar</span></div>
+  <div class="nt" id="tabs"></div>
+  <div class="nav-right">
+    <span class="nav-user" id="nav-user"></span>
+    <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+  </div>
 </nav>
-<main>
-<div class="pg on" id="pg-overview"></div>
-<div class="pg" id="pg-mensal"></div>
-<div class="pg" id="pg-categorias"></div>
-<div class="pg" id="pg-lancamentos"></div>
 
-<div class="pg" id="pg-atualizar"></div>
+<main>
+  <div class="pg on" id="pg-overview"></div>
+  <div class="pg" id="pg-mensal"></div>
+  <div class="pg" id="pg-categorias"></div>
+  <div class="pg" id="pg-lancamentos"></div>
 </main>
-<div class="ft">Financeiro Familiar · Atualizado em <span id="ft-dt"></span></div>
+
+<div id="toast"></div>
+<div class="ft">Financeiro Familiar · <span id="ft-dt"></span></div>
 
 <script>
-const PAGES=['overview','mensal','categorias','lancamentos','atualizar'];
-const LABELS=['Visão Geral','Por Mês','Categorias','Lançamentos','Atualizar Dados'];
-let curPage='overview';
+// ── SUPABASE ─────────────────────────────────────────────────
+const SUPA_URL = 'https://rirzmcsmlvktoohmrssy.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnptY3NtbHZrdG9vaG1yc3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTk4MDYsImV4cCI6MjA5NTAzNTgwNn0.e3q2RgR7f72axsrfXAFCZArQsjEqdxKm3WsKSdI4I-g';
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
-function showP(p){
-  curPage=p;
-  PAGES.forEach(x=>{
-    document.getElementById('pg-'+x).classList.toggle('on',x===p);
-  });
-  document.querySelectorAll('#tabs button').forEach((b,i)=>b.classList.toggle('on',PAGES[i]===p));
+// ── ESTADO GLOBAL ─────────────────────────────────────────────
+let USER = null;
+let MESES = [], TX = [], FIXOS = [], VIAGENS = [];
+let curMes = 0, txMesF = 'Todos', txCatF = 'Todas';
+
+// ── UTILS ─────────────────────────────────────────────────────
+const fmt = v => 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fK = v => {const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1000?(a/1000).toFixed(1)+'k':a.toFixed(0))};
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function fazerLogin() {
+  const email = document.getElementById('email-input').value.trim();
+  const pass = document.getElementById('pass-input').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-err');
+  if (!email || !pass) { mostrarErro('Preencha email e senha'); return; }
+  btn.disabled = true; btn.textContent = 'Entrando...';
+  err.style.display = 'none';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { mostrarErro('Email ou senha incorretos'); btn.disabled=false; btn.textContent='Entrar'; return; }
+  USER = data.user;
+  await inicializar();
 }
 
-document.getElementById('tabs').innerHTML=PAGES.map((p,i)=>
-  `<button class="${p==='overview'?'on':''}" onclick="showP('${p}')">${LABELS[i]}</button>`
-).join('');
-
-const fmt=v=>'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fK=v=>{const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1000?(a/1000).toFixed(1)+'k':a.toFixed(0))};
-
-// ── DADOS INICIAIS ──────────────────────────────────────────────
-let D=null, CAT=null, TX=null;
-
-function loadData(){
-  if(localStorage.getItem('fin_dados')){
-    try{D=JSON.parse(localStorage.getItem('fin_dados'));}catch(e){}
-  }
-  if(localStorage.getItem('fin_cat')){
-    try{CAT=JSON.parse(localStorage.getItem('fin_cat'));}catch(e){}
-  }
-  if(localStorage.getItem('fin_tx')){
-    try{TX=JSON.parse(localStorage.getItem('fin_tx'));}catch(e){}
-  }
-  if(!D) D=DEFAULT_DADOS;
-  if(!CAT) CAT=DEFAULT_CAT;
-  if(!TX) TX=DEFAULT_TX;
+async function fazerLogout() {
+  await sb.auth.signOut();
+  USER = null; MESES=[]; TX=[]; FIXOS=[]; VIAGENS=[];
+  document.getElementById('login-screen').style.display = 'flex';
 }
 
-// ── OVERVIEW ────────────────────────────────────────────────────
-function buildOverview(){
-  const m=D.meses, n=m.length;
-  const tR=m.reduce((s,x)=>s+x.receitas.total,0);
-  const tC=m.reduce((s,x)=>s+x.cartoes.total,0);
-  const tF=m.reduce((s,x)=>s+x.fixos.total,0);
-  const tV=m.reduce((s,x)=>s+(x.viagens||[]).reduce((sv,v)=>sv+v.valor,0),0);
-  const tD=tC+tF+tV;
-  const tS=m.reduce((s,x)=>s+x.saldo,0);
+function mostrarErro(msg) {
+  const err = document.getElementById('login-err');
+  err.textContent = msg; err.style.display = 'block';
+}
 
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Consolidado 2026</div><div class="ss">${m.map(x=>x.mes).join(' · ')}</div></div>`;
-  h+=`<div class="hero">
-    <div class="hc cg"><div class="hl">Receitas</div><div class="hv">${fK(tR)}</div><div class="hs">${n} meses</div></div>
+// ── CARREGAR DADOS ────────────────────────────────────────────
+async function carregarDados() {
+  const [r1, r2, r3, r4] = await Promise.all([
+    sb.from('meses').select('*').order('ano'),
+    sb.from('transacoes').select('*').order('mes').order('valor', {ascending: false}).limit(2000),
+    sb.from('fixos').select('*').order('mes').order('valor', {ascending: false}),
+    sb.from('viagens').select('*').order('mes'),
+  ]);
+  const ordemMeses = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const normMes = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
+  MESES = (r1.data || []).map(m=>({...m,mes:normMes(m.mes)})).sort((a,b) => ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes));
+  const normMesTX = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
+  TX = (r2.data || []).map(t => ({...t, mes: normMesTX(t.mes)}));
+  FIXOS = (r3.data || []).map(f=>({...f,mes:f.mes.normalize('NFC').replace('Março','Marco').replace(/^Mar.o$/i,'Marco')}));
+  VIAGENS = (r4.data || []).map(v=>({...v,mes:v.mes.normalize('NFC').replace('Março','Marco').replace(/^Mar.o$/i,'Marco')}));
+}
+
+// ── INICIALIZAR ───────────────────────────────────────────────
+async function inicializar() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('nav-user').textContent = USER.email;
+  document.getElementById('ft-dt').textContent = new Date().toLocaleDateString('pt-BR');
+
+  document.getElementById('pg-overview').innerHTML = '<div class="loading">Carregando dados...</div>';
+
+  await carregarDados();
+  buildTabs();
+  buildOverview();
+  buildMensal();
+  buildCategorias();
+  buildLancamentos();
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+const PAGES = ['overview','mensal','categorias','lancamentos'];
+const LABELS = ['Visão Geral','Por Mês','Categorias','Lançamentos'];
+function buildTabs() {
+  document.getElementById('tabs').innerHTML = PAGES.map((p,i) =>
+    `<button class="${i===0?'on':''}" onclick="showP('${p}',this)">${LABELS[i]}</button>`
+  ).join('');
+}
+function showP(p, btn) {
+  PAGES.forEach(x => document.getElementById('pg-'+x).classList.remove('on'));
+  document.getElementById('pg-'+p).classList.add('on');
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────
+function buildOverview() {
+  const m = MESES;
+  const tR = m.reduce((s,x)=>s+parseFloat(x.rec_total||0),0);
+  const tC = m.reduce((s,x)=>s+parseFloat(x.cart_total||0),0);
+  const tF = m.reduce((s,x)=>s+parseFloat(x.fixos_total||0),0);
+  const tV = m.reduce((s,x)=>s+parseFloat(x.viagens_total||0),0);
+  const tD = tC+tV+tF;
+  const tS = m.reduce((s,x)=>s+parseFloat(x.saldo||0),0);
+
+  let h = `<div class="sh" style="margin-top:1rem"><div class="st">Consolidado 2026</div><div class="ss">${m.map(x=>x.mes).join(' · ')}</div></div>`;
+  h += `<div class="hero">
+    <div class="hc cg"><div class="hl">Receitas</div><div class="hv">${fK(tR)}</div><div class="hs">${m.length} meses</div></div>
     <div class="hc cr"><div class="hl">Despesas totais</div><div class="hv">${fK(tD)}</div><div class="hs">cartões + viagens + fixos</div></div>
     <div class="hc ca"><div class="hl">Cartões</div><div class="hv">${fK(tC)}</div><div class="hs">Itaú + XP</div></div>
-    <div class="hc ${tS>=0?'cg':'cr'}"><div class="hl">Saldo acumulado</div><div class="hv">${fK(tS)}</div><span class="badge ${tS>=0?'bg':'br'}">${tS>=0?'Positivo':'Negativo'}</span></div>
+    <div class="hc ${tS>=0?'cg':'cr'}"><div class="hl">Saldo acumulado</div><div class="hv">${fK(tS)}</div><span class="badge ${tS>=0?'bg':'br2'}">${tS>=0?'Positivo':'Negativo'}</span></div>
   </div>`;
 
-  h+=`<div class="g2">
+  h += `<div class="g2">
     <div class="cd"><div class="ct">Receitas vs Despesas</div><div class="cw" style="height:210px"><canvas id="c1"></canvas></div></div>
     <div class="cd"><div class="ct">Saldo mensal</div><div class="cw" style="height:210px"><canvas id="c2"></canvas></div></div>
   </div>`;
 
-  // Tabela comparativo
-  h+=`<div class="sh"><div class="st">Resumo comparativo</div></div><div class="cd"><table>`;
-  h+=`<tr><th>Item</th>${m.map(x=>`<th style="text-align:right">${x.mes}</th>`).join('')}<th style="text-align:right">Total</th></tr>`;
-  const linhas=[
-    ['Receitas',...m.map(x=>x.receitas.total),tR],
-    ['— Salário',...m.map(x=>x.receitas.salario),m.reduce((s,x)=>s+x.receitas.salario,0)],
-    ['— Dividendos',...m.map(x=>x.receitas.dividendos),m.reduce((s,x)=>s+x.receitas.dividendos,0)],
-    ['— PJ Andressa',...m.map(x=>x.receitas.pj_andressa),m.reduce((s,x)=>s+x.receitas.pj_andressa,0)],
-    ['Cartões',...m.map(x=>x.cartoes.total),tC],
-    ['— Cartão Itaú',...m.map(x=>x.cartoes.itau),m.reduce((s,x)=>s+x.cartoes.itau,0)],
-    ['— Cartão XP',...m.map(x=>x.cartoes.xp),m.reduce((s,x)=>s+x.cartoes.xp,0)],
-    ['Viagens',...m.map(x=>(x.viagens||[]).reduce((s,v)=>s+v.valor,0)),tV],
-    ...[...new Set(m.flatMap(x=>(x.viagens||[]).map(v=>v.destino)))].map(dest=>
-      ['— '+dest,...m.map(x=>{const v=(x.viagens||[]).find(v=>v.destino===dest);return v?v.valor:0;}),
-      m.reduce((s,x)=>{const v=(x.viagens||[]).find(v=>v.destino===dest);return s+(v?v.valor:0);},0)]
-    ),
-    ['Fixos & Serviços',...m.map(x=>x.fixos.total),tF],
-    ['Despesas totais',...m.map(x=>x.cartoes.total+(x.viagens||[]).reduce((s,v)=>s+v.valor,0)+x.fixos.total),tD],
-    ['SALDO',...m.map(x=>x.saldo),tS],
+  // Comparativo
+  h += `<div class="sh"><div class="st">Resumo comparativo</div></div><div class="cd"><table>`;
+  h += `<tr><th>Item</th>${m.map(x=>`<th style="text-align:right">${x.mes}</th>`).join('')}<th style="text-align:right">Total</th></tr>`;
+  const linhas = [
+    ['Receitas',...m.map(x=>+x.rec_total),tR],
+    ['— Salário',...m.map(x=>+x.rec_salario),m.reduce((s,x)=>s+(+x.rec_salario),0)],
+    ['— Dividendos',...m.map(x=>+x.rec_dividendos),m.reduce((s,x)=>s+(+x.rec_dividendos),0)],
+    ['— PJ Andressa',...m.map(x=>+x.rec_pj_andressa),m.reduce((s,x)=>s+(+x.rec_pj_andressa),0)],
+    ['Cartões',...m.map(x=>+x.cart_total),tC],
+    ['— Cartão Itaú',...m.map(x=>+x.cart_itau),m.reduce((s,x)=>s+(+x.cart_itau),0)],
+    ['— Cartão XP',...m.map(x=>+x.cart_xp),m.reduce((s,x)=>s+(+x.cart_xp),0)],
+    ['Viagens',...m.map(x=>+x.viagens_total),tV],
+    ['Fixos & Serviços',...m.map(x=>+x.fixos_total),tF],
+    ['Despesas totais',...m.map(x=>(+x.cart_total)+(+x.viagens_total)+(+x.fixos_total)),tD],
+    ['SALDO',...m.map(x=>+x.saldo),tS],
   ];
   linhas.forEach(([nome,...vals])=>{
-    const isSaldo=nome==='SALDO';
-    const isDesp=nome==='Despesas totais';
-    const isSub=nome.startsWith('—');
-    const isTotal=['Receitas','Cartões','Fixos & Serviços','Despesas totais','SALDO'].includes(nome);
+    const isSaldo=nome==='SALDO', isDesp=nome==='Despesas totais', isSub=nome.startsWith('—');
     const cls=isSaldo||isDesp?'tr':'';
     const cells=vals.map(v=>{
-      let c='';
-      if(isSaldo)c=v>=0?'pos':'neg';
-      if(isDesp)c='neg';
-      const st=isSub?'color:var(--t3);font-size:11px':'';
-      return `<td class="num ${c}" style="${st}">${fmt(v)}</td>`;
+      let c=''; if(isSaldo)c=v>=0?'pos':'neg'; if(isDesp)c='neg';
+      const prefix=isSaldo?(v>=0?'+':'-'):(isDesp?'':'')
+      return `<td class="num ${c}" style="${isSub?'color:var(--t3);font-size:11px':''}">${prefix}${fmt(v)}</td>`;
     }).join('');
-    const tdSt=isSub?'padding-left:14px;color:var(--t3);font-size:11px':'';
-    const extra='';
-    h+=`<tr class="${cls}"><td style="${tdSt}">${nome}${extra}</td>${cells}</tr>`;
+    h+=`<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}</tr>`;
   });
   h+=`</table></div>`;
 
-  // Top fixos
-  h+=`<div class="sh"><div class="st">Maiores gastos fixos</div><div class="ss">média mensal</div></div><div class="cd">`;
+  // Maiores fixos
   const fmap={};
-  m.forEach(x=>x.fixos.items.forEach(it=>{if(!fmap[it.nome])fmap[it.nome]=0;fmap[it.nome]+=it.valor}));
-  const fsorted=Object.entries(fmap).map(([k,v])=>({n:k,t:v,avg:v/n})).filter(x=>x.t>0).sort((a,b)=>b.t-a.t).slice(0,10);
-  const fmax=fsorted[0]?.t||1;
-  fsorted.forEach(f=>{
-    h+=`<div class="br-row"><span class="br-l">${f.n}</span><div class="br-t"><div class="br-f" style="width:${(f.t/fmax*100).toFixed(1)}%;background:var(--ac)"></div></div><span class="br-v">${fK(f.avg)}/mês</span></div>`;
+  FIXOS.forEach(f=>{if(+f.valor>0){if(!fmap[f.nome])fmap[f.nome]=0;fmap[f.nome]+=+f.valor}});
+  const fsorted=Object.entries(fmap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const fmax=fsorted[0]?.[1]||1;
+  h+=`<div class="sh"><div class="st">Maiores fixos</div><div class="ss">acumulado</div></div><div class="cd">`;
+  fsorted.forEach(([n,v])=>{
+    h+=`<div class="br-row"><span class="br-l">${n}</span><div class="br-t"><div class="br-f" style="width:${(v/fmax*100).toFixed(1)}%;background:var(--ac)"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v/MESES.length)}/mês</span></div>`;
   });
   h+=`</div>`;
 
   document.getElementById('pg-overview').innerHTML=h;
 
-  new Chart(document.getElementById('c1'),{
-    type:'bar',data:{labels:m.map(x=>x.mes),datasets:[
-      {label:'Receitas',data:m.map(x=>x.receitas.total),backgroundColor:'#1A5C3A',borderRadius:5},
-      {label:'Despesas',data:m.map(x=>x.cartoes.total+(x.viagens||[]).reduce((s,v)=>s+v.valor,0)+x.fixos.total),backgroundColor:'#C8973A',borderRadius:5}
-    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
-  });
-  new Chart(document.getElementById('c2'),{
-    type:'bar',data:{labels:m.map(x=>x.mes),datasets:[{data:m.map(x=>x.saldo),backgroundColor:m.map(x=>x.saldo>=0?'rgba(26,92,58,.8)':'rgba(139,26,26,.8)'),borderRadius:5}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}
-  });
+  new Chart(document.getElementById('c1'),{type:'bar',data:{labels:m.map(x=>x.mes),datasets:[
+    {label:'Receitas',data:m.map(x=>+x.rec_total),backgroundColor:'#1A5C3A',borderRadius:5},
+    {label:'Despesas',data:m.map(x=>(+x.cart_total)+(+x.viagens_total)+(+x.fixos_total)),backgroundColor:'#C8973A',borderRadius:5}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+  new Chart(document.getElementById('c2'),{type:'bar',data:{labels:m.map(x=>x.mes),datasets:[{data:m.map(x=>+x.saldo),backgroundColor:m.map(x=>(+x.saldo)>=0?'rgba(26,92,58,.8)':'rgba(139,26,26,.8)'),borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
 }
 
-// ── MENSAL ───────────────────────────────────────────────────────
-let curMes=0;
-function buildMensal(){
+// ── MENSAL ────────────────────────────────────────────────────
+function buildMensal() {
   let h=`<div class="sh" style="margin-top:1rem"><div class="st">Resumo mensal</div></div>`;
-  h+=`<div class="ms" id="ms-sel">${D.meses.map((m,i)=>`<button class="${i===0?'on':''}" onclick="selMes(${i})">${m.mes}</button>`).join('')}</div>`;
+  h+=`<div class="ms" id="ms-sel">${MESES.map((m,i)=>`<button class="${i===0?'on':''}" onclick="selMes(${i},this)">${m.mes}</button>`).join('')}<button onclick="selMesTotal(this)">Total</button></div>`;
   h+=`<div id="mes-detail"></div>`;
   document.getElementById('pg-mensal').innerHTML=h;
   renderMes(0);
 }
-function selMes(i){
+function selMesTotal(btn){
+  document.querySelectorAll('#ms-sel button').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  renderMesTotal();
+}
+function renderMesTotal(){
+  const tR=MESES.reduce((s,m)=>s+parseFloat(m.rec_total||0),0);
+  const tC=MESES.reduce((s,m)=>s+parseFloat(m.cart_total||0),0);
+  const tF=MESES.reduce((s,m)=>s+parseFloat(m.fixos_total||0),0);
+  const tV=MESES.reduce((s,m)=>s+parseFloat(m.viagens_total||0),0);
+  const tS=MESES.reduce((s,m)=>s+parseFloat(m.saldo||0),0);
+  const tot=tC+tV+tF;
+  const fmap={};
+  FIXOS.forEach(f=>{if(+f.valor>0){if(!fmap[f.nome])fmap[f.nome]=0;fmap[f.nome]+=+f.valor;}});
+  const fixSorted=Object.entries(fmap).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const vmap={};
+  VIAGENS.forEach(v=>{if(!vmap[v.destino])vmap[v.destino]=0;vmap[v.destino]+=+v.valor;});
+  let h=`<div class="g2">
+    <div class="cd"><div class="ct">Receitas & Cartões — Total Anual</div><table>
+      <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
+      <tr><td>Salário</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_salario||0),0))}</td></tr>
+      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0)>0?`<tr><td>Dividendos</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0))}</td></tr>`:''}
+      <tr><td>PJ Andressa</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_pj_andressa||0),0))}</td></tr>
+      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0)>0?`<tr><td>Outros</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0))}</td></tr>`:''}
+      <tr class="tr"><td>Total Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
+    </table><hr><table>
+      <tr><td>Cartão Itaú</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_itau||0),0))}</td></tr>
+      <tr><td>Cartão XP</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_xp||0),0))}</td></tr>
+      <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(tC)}</td></tr>
+    </table>
+    ${Object.keys(vmap).length?`<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${Object.entries(vmap).sort((a,b)=>b[1]-a[1]).map(([d,v])=>`<tr><td>${d}</td><td class="num">${fmt(v)}</td></tr>`).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(tV)}</td></tr></table>`:''}
+    <hr>
+    <table style="margin-bottom:8px">
+      <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(tC)}</td></tr>
+      <tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(tV)}</td></tr>
+      <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(tF)}</td></tr>
+      <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
+      <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
+    </table>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <div><div class="hl">Saldo acumulado</div><div class="${tS>=0?'sp':'sn'}">${tS>=0?'+':''}${fmt(tS)}</div></div>
+    </div></div>
+    <div class="cd"><div class="ct">Fixos acumulados</div><table>
+      <tr><th>Descrição</th><th style="text-align:right">Total</th><th style="text-align:right">Média/mês</th></tr>
+      ${fixSorted.map(([n,v])=>`<tr><td>${n}</td><td class="num">${fmt(v)}</td><td class="num" style="color:var(--t3)">${fmt(v/MESES.length)}</td></tr>`).join('')}
+      <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(tF)}</td><td class="num neg" style="color:var(--t3)">${fmt(tF/MESES.length)}/mês</td></tr>
+    </table></div>
+  </div>`;
+  document.getElementById('mes-detail').innerHTML=h;
+}
+function selMes(i,btn){
   curMes=i;
-  document.querySelectorAll('#ms-sel button').forEach((b,j)=>b.classList.toggle('on',j===i));
+  document.querySelectorAll('#ms-sel button').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
   renderMes(i);
 }
 function renderMes(i){
-  const m=D.meses[i];
-  const tVmes=(m.viagens||[]).reduce((s,v)=>s+v.valor,0);const tot=m.cartoes.total+tVmes+m.fixos.total;
-  const tp=((m.saldo/m.receitas.total)*100).toFixed(1);
+  const m=MESES[i];
+  if(!m)return;
+  const viaM = VIAGENS.filter(v=>v.mes===m.mes);
+  const fixM = FIXOS.filter(f=>f.mes===m.mes&&+f.valor>0).sort((a,b)=>+b.valor-+a.valor);
+  const tot=(+m.cart_total)+(+m.viagens_total)+(+m.fixos_total);
   let h=`<div class="g2">
     <div class="cd"><div class="ct">Receitas & Cartões — ${m.mes}</div><table>
       <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
-      ${m.receitas.salario?`<tr><td>Salário</td><td class="num">${fmt(m.receitas.salario)}</td></tr>`:''}
-      ${m.receitas.dividendos?`<tr><td>Dividendos</td><td class="num">${fmt(m.receitas.dividendos)}</td></tr>`:''}
-      ${m.receitas.pj_andressa?`<tr><td>PJ Andressa</td><td class="num">${fmt(m.receitas.pj_andressa)}</td></tr>`:''}
-      ${m.receitas.outros?`<tr><td>Outros</td><td class="num">${fmt(m.receitas.outros)}</td></tr>`:''}
-      <tr class="tr"><td>Total Receitas</td><td class="num pos">${fmt(m.receitas.total)}</td></tr>
+      ${+m.rec_salario?`<tr><td>Salário</td><td class="num">${fmt(+m.rec_salario)}</td></tr>`:''}
+      ${+m.rec_dividendos?`<tr><td>Dividendos</td><td class="num">${fmt(+m.rec_dividendos)}</td></tr>`:''}
+      ${+m.rec_pj_andressa?`<tr><td>PJ Andressa</td><td class="num">${fmt(+m.rec_pj_andressa)}</td></tr>`:''}
+      ${+m.rec_outros?`<tr><td>Outros</td><td class="num">${fmt(+m.rec_outros)}</td></tr>`:''}
+      <tr class="tr"><td>Total Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
     </table><hr><table>
-      <tr><td>Cartão Itaú</td><td class="num">${fmt(m.cartoes.itau)}</td></tr>
-      <tr><td>Cartão XP</td><td class="num">${fmt(m.cartoes.xp)}</td></tr>
-      <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(m.cartoes.total)}</td></tr>
+      <tr><td>Cartão Itaú</td><td class="num">${fmt(+m.cart_itau)}</td></tr>
+      <tr><td>Cartão XP</td><td class="num">${fmt(+m.cart_xp)}</td></tr>
+      <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(+m.cart_total)}</td></tr>
     </table>
-    ${(m.viagens||[]).length>0?`<hr><table>
-      <tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>
-      ${(m.viagens||[]).map(v=>`<tr><td>${v.destino}</td><td class="num">${fmt(v.valor)}</td></tr>`).join('')}
-      <tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(tVmes)}</td></tr>
-    </table>`:''}
+    ${viaM.length?`<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${viaM.map(v=>`<tr><td>${v.destino}</td><td class="num">${fmt(+v.valor)}</td></tr>`).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(+m.viagens_total)}</td></tr></table>`:''}
     <hr>
+    <table style="margin-bottom:8px">
+      <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(+m.cart_total)}</td></tr>
+      ${viaM.length?`<tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(+m.viagens_total)}</td></tr>`:''}
+      <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(+m.fixos_total)}</td></tr>
+      <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
+      <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
+    </table>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-      <div><div class="hl">Saldo do mês</div><div class="${m.saldo>=0?'sp':'sn'}">${m.saldo>=0?'+':''}${fmt(m.saldo)}</div></div>
-      <div style="text-align:right"><div class="hl">Despesas totais</div><div style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--r)">${fmt(tot)}</div><div style="font-size:10px;color:var(--t3)">cartões + viagens + fixos</div></div>
+      <div><div class="hl">Saldo do mês</div><div class="${+m.saldo>=0?'sp':'sn'}">${+m.saldo>=0?'+':'-'}${fmt(+m.saldo)}</div></div>
     </div></div>
     <div class="cd"><div class="ct">Fixos — ${m.mes}</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Valor</th></tr>
-      ${m.fixos.items.slice().sort((a,b)=>b.valor-a.valor).map(x=>`<tr><td style="${x.valor===0?'color:var(--t3)':''}">${x.nome}</td><td class="num" style="${x.valor===0?'color:var(--t3)':''}">${fmt(x.valor)}</td></tr>`).join('')}
-      <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(m.fixos.total)}</td></tr>
+      ${fixM.map(f=>`<tr><td style="${+f.valor===0?'color:var(--t3)':''}">${f.nome}</td><td class="num">${fmt(+f.valor)}</td></tr>`).join('')}
+      <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(+m.fixos_total)}</td></tr>
     </table></div>
   </div>`;
   document.getElementById('mes-detail').innerHTML=h;
 }
 
-// ── CATEGORIAS ──────────────────────────────────────────────────
-function buildCategorias(){
-  const cats=Object.keys(CAT);
-  const totals=cats.map(c=>({n:c,j:CAT[c].jan||0,f:CAT[c].fev||0,m:CAT[c].mar||0,a:CAT[c].abr||0,mai:CAT[c].mai||0,t:(CAT[c].jan||0)+(CAT[c].fev||0)+(CAT[c].mar||0)+(CAT[c].abr||0)+(CAT[c].mai||0)})).filter(x=>x.t>0).sort((a,b)=>b.t-a.t);
-  const mx=totals[0]?.t||1;
+// ── CATEGORIAS ────────────────────────────────────────────────
+function buildCategorias() {
+  const mesesNomes = MESES.map(m=>m.mes);
+  const catMap = {};
+  TX.forEach(t=>{
+    if(!catMap[t.categoria]) catMap[t.categoria]={total:0};
+    if(!catMap[t.categoria][t.mes]) catMap[t.categoria][t.mes]=0;
+    catMap[t.categoria][t.mes]+=parseFloat(t.valor);
+    catMap[t.categoria].total+=parseFloat(t.valor);
+  });
+  const cats=Object.entries(catMap).filter(([,v])=>v.total>0).sort((a,b)=>b[1].total-a[1].total);
+  const mx=cats[0]?.[1].total||1;
+  const cores=['#1A5C3A','#2D7A4F','#C8973A','#D4A84E','#0D3B6E','#1A5C8A','#8B1A1A','#A03333','#4A7C59','#6BBF8E','#7A4E0D','#9B6A2A','#2A4A7A','#5A7A3A','#7A2A5A'];
 
   let h=`<div class="sh" style="margin-top:1rem"><div class="st">Gastos por categoria</div><div class="ss">cartões Itaú + XP</div></div>`;
-
-  h+=`<div class="cd" style="margin-bottom:14px"><div class="ct">Evolução mensal (top 6)</div><div class="cw" style="height:280px"><canvas id="cCat"></canvas></div></div>`;
-
-  h+=`<div class="g2">
-    <div class="cd"><div class="ct">Ranking acumulado</div>`;
-  const cores=['#1A5C3A','#2D7A4F','#3C9164','#4DA878','#6BBF8E','#89D0A3','#A7E1B8','#C5F0CD','#C8973A','#D4A84E','#E0B962','#ECCC80','#8B1A1A','#A03333','#B54D4D','#CA6666','#DF8080'];
-  totals.forEach((c,i)=>{
-    h+=`<div class="br-row"><span class="br-l" style="min-width:140px;font-size:11px">${c.n}</span><div class="br-t"><div class="br-f" style="width:${(c.t/mx*100).toFixed(1)}%;background:${cores[i%cores.length]}"></div></div><span class="br-v">${fK(c.t)}</span></div>`;
+  h+=`<div class="cd" style="margin-bottom:14px"><div class="ct">Top 6 — evolução mensal</div><div class="cw" style="height:280px"><canvas id="cCat"></canvas></div></div>`;
+  h+=`<div class="g2"><div class="cd"><div class="ct">Ranking acumulado</div>`;
+  cats.forEach(([n,v],i)=>{
+    h+=`<div class="br-row"><span class="br-l" style="min-width:150px;font-size:11px">${n}</span><div class="br-t"><div class="br-f" style="width:${(v.total/mx*100).toFixed(1)}%;background:${cores[i%cores.length]}"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v.total)}</span></div>`;
   });
-  h+=`</div>`;
-
-  h+=`<div class="cd"><div class="ct">Tabela comparativa</div><table>
-    <tr><th>Categoria</th><th style="text-align:right">Jan</th><th style="text-align:right">Fev</th><th style="text-align:right">Mar</th><th style="text-align:right">Abr</th><th style="text-align:right">Mai</th><th style="text-align:right">Total</th></tr>`;
-  totals.forEach(c=>{
-    h+=`<tr><td style="font-size:11px;font-weight:500">${c.n}</td><td class="num" style="font-size:11px">${fmt(c.j)}</td><td class="num" style="font-size:11px">${fmt(c.f)}</td><td class="num" style="font-size:11px">${fmt(c.m)}</td><td class="num" style="font-size:11px">${fmt(c.a)}</td><td class="num" style="font-size:11px">${fmt(c.mai||0)}</td><td class="num" style="font-size:11px;font-weight:600">${fmt(c.t)}</td></tr>`;
+  h+=`</div><div class="cd"><div class="ct">Tabela comparativa</div><table>
+    <tr><th>Categoria</th>${mesesNomes.map(mn=>`<th style="text-align:right">${mn.slice(0,3)}</th>`).join('')}<th style="text-align:right">Total</th></tr>`;
+  cats.forEach(([n,v])=>{
+    h+=`<tr><td style="font-size:11px;font-weight:500">${n}</td>${mesesNomes.map(mn=>`<td class="num" style="font-size:11px">${fmt(v[mn]||0)}</td>`).join('')}<td class="num" style="font-size:11px;font-weight:600">${fmt(v.total)}</td></tr>`;
   });
-  const tj=totals.reduce((s,c)=>s+c.j,0),tf=totals.reduce((s,c)=>s+c.f,0),tm=totals.reduce((s,c)=>s+c.m,0),ta=totals.reduce((s,c)=>s+c.a,0);
-  h+=`<tr class="tr"><td>TOTAL</td><td class="num">${fmt(tj)}</td><td class="num">${fmt(tf)}</td><td class="num">${fmt(tm)}</td><td class="num">${fmt(ta)}</td><td class="num">${fmt(totals.reduce((s,c)=>s+(c.mai||0),0))}</td><td class="num">${fmt(tj+tf+tm+ta+totals.reduce((s,c)=>s+(c.mai||0),0))}</td></tr></table></div></div>`;
-
+  const totRow=mesesNomes.map(mn=>cats.reduce((s,[,v])=>s+(v[mn]||0),0));
+  h+=`<tr class="tr"><td>TOTAL</td>${totRow.map(v=>`<td class="num">${fmt(v)}</td>`).join('')}<td class="num">${fmt(cats.reduce((s,[,v])=>s+v.total,0))}</td></tr>`;
+  h+=`</table></div></div>`;
   document.getElementById('pg-categorias').innerHTML=h;
 
-  const top6=totals.slice(0,6);
+  const top6=cats.slice(0,6);
   const cc=['#1A5C3A','#C8973A','#0D3B6E','#8B1A1A','#4A7C59','#7A4E0D'];
-  new Chart(document.getElementById('cCat'),{
-    type:'bar',data:{labels:['Janeiro','Fevereiro','Março','Abril','Maio'],datasets:top6.map((c,i)=>({label:c.n,data:[c.j,c.f,c.m,c.a,c.mai||0],backgroundColor:cc[i],borderRadius:4}))},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}}},scales:{y:{stacked:true,ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}}}}
-  });
+  new Chart(document.getElementById('cCat'),{type:'bar',data:{labels:mesesNomes,datasets:top6.map(([n,v],i)=>({label:n,data:mesesNomes.map(mn=>v[mn]||0),backgroundColor:cc[i],borderRadius:4}))},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}}},scales:{y:{stacked:true,ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}}}}});
 }
 
-// ── LANÇAMENTOS ─────────────────────────────────────────────────
-let txMF='Todos',txCF='Todas';
-function buildLancamentos(){
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Lançamentos de cartão</div><div class="ss" id="tx-cnt"></div></div>`;
-  h+=`<div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap">
-    <div class="ms" id="tx-mf"></div>
-    <select id="tx-cf" onchange="txCF=this.value;renderTx()" style="padding:5px 12px;border:1px solid var(--bd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--s);color:var(--t)">
-      <option value="Todas">Todas categorias</option>
-    </select>
-    <input type="text" id="tx-q" placeholder="Buscar estabelecimento..." oninput="renderTx()" style="padding:5px 12px;border:1px solid var(--bd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;flex:1;min-width:180px;background:var(--s)">
+// ── LANÇAMENTOS ───────────────────────────────────────────────
+function buildLancamentos() {
+  const mesesNomes=['Todos',...new Set(TX.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
+  const cats=['Todas',...new Set(TX.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
+
+  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Lançamentos</div><div class="ss" id="tx-cnt"></div></div>`;
+  h+=`<div class="filter-row">
+    <select class="sel" id="tx-mf" onchange="txMesF=this.value;renderTx()">${mesesNomes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
+    <select class="sel" id="tx-cf" onchange="txCatF=this.value;renderTx()">${cats.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+    <input type="text" class="search-input" id="tx-q" placeholder="Buscar estabelecimento..." oninput="renderTx()">
   </div>`;
   h+=`<div class="cd" style="max-height:550px;overflow-y:auto"><table><thead style="position:sticky;top:0;background:var(--s)">
     <tr><th>Data</th><th>Estabelecimento</th><th>Categoria</th><th>Cartão</th><th style="text-align:right">Valor</th></tr>
   </thead><tbody id="tx-tb"></tbody></table></div>`;
   document.getElementById('pg-lancamentos').innerHTML=h;
-
-  document.getElementById('tx-mf').innerHTML=['Todos','Janeiro','Fevereiro','Março','Abril','Maio'].map(m=>
-    `<button class="${m==='Todos'?'on':''}" onclick="txMF='${m}';document.querySelectorAll('#tx-mf button').forEach((b,i)=>b.classList.toggle('on',['Todos','Janeiro','Fevereiro','Março','Abril','Maio'][i]==='${m}'));renderTx()">${m}</button>`
-  ).join('');
-
-  const cats=[...new Set(TX.map(t=>t.cat))].sort();
-  const sel=document.getElementById('tx-cf');
-  cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
   renderTx();
 }
-function getAllCats(){
-  return [...new Set(TX.map(t=>t.cat))].sort();
-}
-function editCat(txIdx){
-  const t=TX[txIdx];
-  const cats=getAllCats();
-  const sel=document.getElementById('cat-sel-'+txIdx);
-  if(sel){sel.remove();renderTx();return;}
-  const td=document.getElementById('cat-td-'+txIdx);
-  td.innerHTML=`<select id="cat-sel-${txIdx}" onchange="saveCat(${txIdx},this.value)" style="font-size:11px;padding:2px 4px;border:1px solid var(--bd);border-radius:4px;background:var(--s);font-family:'DM Sans',sans-serif">
-    ${cats.map(c=>`<option value="${c}" ${c===t.cat?'selected':''}>${c}</option>`).join('')}
-    <option value="__nova__">+ Nova categoria...</option>
-  </select>`;
-}
-function saveCat(txIdx,val){
-  if(val==='__nova__'){
-    const nova=prompt('Nome da nova categoria:');
-    if(!nova){renderTx();return;}
-    val=nova;
-  }
-  const oldCat=TX[txIdx].cat;
-  TX[txIdx].cat=val;
-  // Salvar edições no localStorage
-  let edits=JSON.parse(localStorage.getItem('fin_cat_edits')||'{}');
-  edits[TX[txIdx].estab]=val;
-  localStorage.setItem('fin_cat_edits',JSON.stringify(edits));
-  // Aplicar mesma categoria a todos com mesmo estabelecimento
-  const estab=TX[txIdx].estab;
-  let count=0;
-  TX.forEach((t,i)=>{if(t.estab===estab&&t.cat===oldCat){t.cat=val;count++;}});
-  renderTx();
-  showToast(`${estab} → ${val} (${count} lançamento${count>1?'s':''} atualizado${count>1?'s':''})`);
-}
-function showToast(msg){
-  let toast=document.getElementById('toast');
-  if(!toast){
-    toast=document.createElement('div');
-    toast.id='toast';
-    toast.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A3A2A;color:#F7F5F0;padding:10px 20px;border-radius:8px;font-size:13px;font-family:"DM Sans",sans-serif;z-index:10000;transition:opacity 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
-    document.body.appendChild(toast);
-  }
-  toast.textContent=msg;
-  toast.style.opacity='1';
-  setTimeout(()=>{toast.style.opacity='0';},3000);
-}
-function applyStoredEdits(){
-  const edits=JSON.parse(localStorage.getItem('fin_cat_edits')||'{}');
-  if(Object.keys(edits).length===0)return;
-  TX.forEach(t=>{if(edits[t.estab])t.cat=edits[t.estab];});
-}
-function renderTx(){
+
+function renderTx() {
   const q=(document.getElementById('tx-q')?.value||'').toLowerCase();
   let f=TX;
-  if(txMF!=='Todos')f=f.filter(t=>t.mes===txMF);
-  if(txCF!=='Todas')f=f.filter(t=>t.cat===txCF);
-  if(q)f=f.filter(t=>t.estab.toLowerCase().includes(q));
-  f.sort((a,b)=>b.valor-a.valor);
-  const tot=f.reduce((s,t)=>s+t.valor,0);
-  const editCount=Object.keys(JSON.parse(localStorage.getItem('fin_cat_edits')||'{}')).length;
-  document.getElementById('tx-cnt').textContent=`${f.length} lançamentos — Total: ${fmt(tot)}${editCount>0?' · '+editCount+' categoria(s) editada(s)':''}`;
+  if(txMesF!=='Todos')f=f.filter(t=>t.mes===txMesF);
+  if(txCatF!=='Todas')f=f.filter(t=>t.categoria===txCatF);
+  if(q)f=f.filter(t=>t.estabelecimento.toLowerCase().includes(q));
+  const tot=f.reduce((s,t)=>s+parseFloat(t.valor),0);
+  document.getElementById('tx-cnt').textContent=`${f.length} lançamentos — Total: ${fmt(tot)}`;
   document.getElementById('tx-tb').innerHTML=f.slice(0,300).map((t,i)=>{
     const bg=i%2===0?'var(--s2)':'var(--s)';
-    const txIdx=TX.indexOf(t);
-    return `<tr style="background:${bg}"><td style="font-size:11px;white-space:nowrap">${t.data}</td><td style="font-size:11px">${t.estab}</td><td id="cat-td-${txIdx}" style="font-size:10px"><span onclick="editCat(${txIdx})" style="background:var(--s2);padding:1px 6px;border-radius:4px;cursor:pointer" title="Clique para alterar categoria">${t.cat} ✎</span></td><td style="font-size:11px">${t.cartao}</td><td class="num" style="font-size:11px;font-weight:500">${fmt(t.valor)}</td></tr>`;
+    return `<tr style="background:${bg}">
+      <td style="font-size:11px;white-space:nowrap">${t.data}</td>
+      <td style="font-size:11px">${t.estabelecimento}</td>
+      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\\'")}',this)" title="Clique para alterar">${t.categoria} ✎</span></td>
+      <td style="font-size:11px">${t.cartao}</td>
+      <td class="num" style="font-size:11px;font-weight:500">${fmt(parseFloat(t.valor))}</td>
+    </tr>`;
   }).join('');
 }
 
-// ── ATUALIZAR DADOS ─────────────────────────────────────────────
-function buildAtualizar(){
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Atualizar dados</div><div class="ss">importe seu arquivo dados.json atualizado</div></div>`;
-  h+=`<div class="cd" style="margin-bottom:14px">
-    <div class="ct">Importar dados.json</div>
-    <p style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.6">
-      Edite o arquivo <strong>dados.json</strong> com os novos meses e importe aqui. O dashboard será atualizado instantaneamente.
-      Você também pode atualizar os dados de <strong>categorias</strong> e <strong>transações</strong> separadamente.
-    </p>
-    <div class="upload-zone" id="uz-dados" onclick="document.getElementById('fi-dados').click()"
-      ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')"
-      ondrop="event.preventDefault();this.classList.remove('drag');handleFile(event.dataTransfer.files[0],'dados')">
-      <div style="font-size:14px;font-weight:500;margin-bottom:4px">📂 Arraste ou clique para importar dados.json</div>
-      <div style="font-size:12px;color:var(--t3)">Receitas, cartões, fixos e investimentos</div>
-    </div>
-    <input type="file" id="fi-dados" accept=".json" style="display:none" onchange="handleFile(this.files[0],'dados')">
-  </div>`;
-
-  h+=`<div class="cd" style="margin-bottom:14px">
-    <div class="ct">Importar categorias e transações</div>
-    <div class="g2">
-      <div class="upload-zone" onclick="document.getElementById('fi-cat').click()"
-        ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')"
-        ondrop="event.preventDefault();this.classList.remove('drag');handleFile(event.dataTransfer.files[0],'cat')">
-        <div style="font-size:13px;font-weight:500;margin-bottom:4px">📊 categorias.json</div>
-        <div style="font-size:11px;color:var(--t3)">Gastos por categoria por mês</div>
-      </div>
-      <div class="upload-zone" onclick="document.getElementById('fi-tx').click()"
-        ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')"
-        ondrop="event.preventDefault();this.classList.remove('drag');handleFile(event.dataTransfer.files[0],'tx')">
-        <div style="font-size:13px;font-weight:500;margin-bottom:4px">💳 transacoes.json</div>
-        <div style="font-size:11px;color:var(--t3)">Lançamentos individuais de cartão</div>
-      </div>
-    </div>
-    <input type="file" id="fi-cat" accept=".json" style="display:none" onchange="handleFile(this.files[0],'cat')">
-    <input type="file" id="fi-tx" accept=".json" style="display:none" onchange="handleFile(this.files[0],'tx')">
-  </div>`;
-
-  h+=`<div class="cd">
-    <div class="ct">Resetar para dados originais</div>
-    <p style="font-size:13px;color:var(--t2);margin-bottom:10px">Remove todos os dados importados e volta para os dados originais embutidos no HTML.</p>
-    <button onclick="resetData()" style="padding:8px 20px;border:1px solid var(--r);border-radius:6px;background:var(--rbg);color:var(--r);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">Resetar dados</button>
-  </div>`;
-
-  h+=`<div class="sh"><div class="st">Instruções</div></div><div class="cd">
-    <ol style="font-size:13px;color:var(--t2);line-height:2;padding-left:20px">
-      <li>Abra uma conversa com o Claude e peça para ele gerar o <strong>dados.json</strong> atualizado com o novo mês</li>
-      <li>Baixe os 3 arquivos JSON que o Claude gerar (dados, categorias, transações)</li>
-      <li>Volte aqui e importe cada arquivo na zona correspondente</li>
-      <li>O dashboard atualiza na hora — os dados ficam salvos no navegador</li>
-    </ol>
-  </div>`;
-
-  document.getElementById('pg-atualizar').innerHTML=h;
-}
-
-function handleFile(file,type){
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const data=JSON.parse(e.target.result);
-      if(type==='dados'){D=data;localStorage.setItem('fin_dados',JSON.stringify(data));document.getElementById('nav-dt').textContent='Atualizado em '+D.atualizado;document.getElementById('ft-dt').textContent=D.atualizado;}
-      else if(type==='cat'){CAT=data;localStorage.setItem('fin_cat',JSON.stringify(data));}
-      else if(type==='tx'){TX=data;localStorage.setItem('fin_tx',JSON.stringify(data));}
-      alert('✅ Dados importados com sucesso! Recarregue a página para ver as atualizações.');
-      location.reload();
-    }catch(err){alert('❌ Erro ao ler arquivo: '+err.message)}
+async function editCat(id, catAtual, el) {
+  const allCats=[...new Set(TX.map(t=>t.categoria))].sort();
+  const sel=document.createElement('select');
+  sel.className='cat-sel';
+  allCats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===catAtual)o.selected=true;sel.appendChild(o);});
+  const nova=document.createElement('option');nova.value='__nova__';nova.textContent='+ Nova...';sel.appendChild(nova);
+  el.replaceWith(sel);
+  sel.focus();
+  sel.onchange=async()=>{
+    let val=sel.value;
+    if(val==='__nova__'){val=prompt('Nome da nova categoria:');if(!val){renderTx();return;}}
+    const estab=TX.find(t=>t.id===id)?.estabelecimento;
+    const {error}=await sb.from('transacoes').update({categoria:val}).eq('estabelecimento',estab);
+    if(!error){TX.forEach(t=>{if(t.estabelecimento===estab)t.categoria=val;});showToast(`${estab} → ${val}`);renderTx();buildCategorias();}
+    else showToast('Erro ao salvar');
   };
-  reader.readAsText(file);
 }
 
-function resetData(){
-  if(confirm('Tem certeza? Isso vai apagar todos os dados importados e voltar para os originais.')){
-    localStorage.removeItem('fin_dados');
-    localStorage.removeItem('fin_cat');
-    localStorage.removeItem('fin_tx');
-    location.reload();
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>{t.style.opacity='0'},3000)}
+
+// ── INIT ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    USER = session.user;
+    await inicializar();
   }
-}
-
-// ── DEFAULTS (dados embutidos) ──────────────────────────────────
-const DEFAULT_DADOS={"atualizado":"19/05/2026","meses":[{"mes":"Janeiro","ano":2026,"receitas":{"salario":48497.65,"dividendos":38493.5,"pj_andressa":14000.0,"outros":219.0,"total":101210.15},"cartoes":{"itau":16242.52,"xp":23568.17,"total":39810.69},"viagens":[{"destino":"Búzios","valor":10188.0}],"fixos":{"items":[{"nome":"Babá (Carolin)","valor":2700.8},{"nome":"Escola dos filhos","valor":7030.62},{"nome":"Atividades Filhos","valor":0},{"nome":"Educação Filhos","valor":0},{"nome":"Financiamento Imobiliário","valor":3268.86},{"nome":"Condomínio (PAG TIT 409998)","valor":3321.84},{"nome":"Condomínio (BKI RIO)","valor":0},{"nome":"Esporte (quadra+prof+personal)","valor":2590.0},{"nome":"Funcionários/Serviços","valor":2070.0},{"nome":"Energia – Light","valor":1139.45},{"nome":"Gás – CEG","valor":522.68},{"nome":"Internet/Tel – Vivo","valor":569.55},{"nome":"E-Social","valor":0},{"nome":"Impostos & Taxas","valor":2488.51},{"nome":"Saúde – Clínica","valor":1200.0},{"nome":"Educação & Trabalho","valor":0},{"nome":"Tarifa Bancária Bradesco","valor":85.1},{"nome":"IOF","valor":8.22},{"nome":"DARF","valor":0},{"nome":"DETRAN RJ","valor":0},{"nome":"Taxa Bombeiro","valor":0},{"nome":"Outros PIX enviados","valor":240.0},{"nome":"Outros","valor":0}],"total":27235.63},"saldo":23975.83},{"mes":"Fevereiro","ano":2026,"receitas":{"salario":61726.79,"dividendos":0,"pj_andressa":17591.0,"outros":0,"total":79317.79},"cartoes":{"itau":13952.56,"xp":39756.6,"total":53709.16},"viagens":[],"fixos":{"items":[{"nome":"Babá (Carolin)","valor":2663.2},{"nome":"Escola dos filhos","valor":7030.62},{"nome":"Atividades Filhos","valor":0},{"nome":"Educação Filhos","valor":0},{"nome":"Financiamento Imobiliário","valor":3267.11},{"nome":"Condomínio (PAG TIT 409998)","valor":3003.61},{"nome":"Condomínio (BKI RIO)","valor":748.8},{"nome":"Esporte (quadra+prof+personal)","valor":2200.0},{"nome":"Funcionários/Serviços","valor":1540.0},{"nome":"Energia – Light","valor":1336.32},{"nome":"Gás – CEG","valor":413.97},{"nome":"Internet/Tel – Vivo","valor":564.79},{"nome":"E-Social","valor":1185.03},{"nome":"Impostos & Taxas","valor":0},{"nome":"Saúde – Clínica","valor":0},{"nome":"Educação & Trabalho","valor":0},{"nome":"Tarifa Bancária Bradesco","valor":0},{"nome":"IOF","valor":26.52},{"nome":"DARF","valor":130.19},{"nome":"DETRAN RJ","valor":293.71},{"nome":"Taxa Bombeiro","valor":0},{"nome":"Outros PIX enviados","valor":300.0},{"nome":"Outros","valor":0}],"total":24703.87},"saldo":904.76},{"mes":"Março","ano":2026,"receitas":{"salario":54230.8,"dividendos":0,"pj_andressa":14000.0,"outros":0,"total":68230.8},"cartoes":{"itau":6827.16,"xp":28816.36,"total":35643.52},"viagens":[{"destino":"Miami","valor":11100.0}],"fixos":{"items":[{"nome":"Babá (Carolin)","valor":2813.6},{"nome":"Escola dos filhos","valor":8210.25},{"nome":"Atividades Filhos","valor":614.1},{"nome":"Educação Filhos","valor":0},{"nome":"Financiamento Imobiliário","valor":3263.63},{"nome":"Condomínio (PAG TIT 409998)","valor":3166.19},{"nome":"Condomínio (BKI RIO)","valor":748.8},{"nome":"Esporte (quadra+prof+personal)","valor":1860.0},{"nome":"Funcionários/Serviços","valor":1220.0},{"nome":"Energia – Light","valor":1435.15},{"nome":"Gás – CEG","valor":470.1},{"nome":"Internet/Tel – Vivo","valor":564.79},{"nome":"E-Social","valor":0},{"nome":"Impostos & Taxas","valor":2488.51},{"nome":"Saúde – Clínica","valor":0},{"nome":"Educação & Trabalho","valor":0},{"nome":"Tarifa Bancária Bradesco","valor":85.1},{"nome":"IOF","valor":12.21},{"nome":"DARF","valor":578.12},{"nome":"DETRAN RJ","valor":0},{"nome":"Taxa Bombeiro","valor":385.93},{"nome":"Outros PIX enviados","valor":350.0},{"nome":"Outros","valor":0}],"total":28266.48},"saldo":-6779.2},{"mes":"Abril","ano":2026,"receitas":{"salario":77142.74,"dividendos":0,"pj_andressa":14000.0,"outros":4118.77,"total":95261.51},"cartoes":{"itau":5520.4,"xp":26820.54,"total":34279.94,"extras":1939.0},"viagens":[{"destino":"Miami","valor":26431.81}],"fixos":{"items":[{"nome":"Babá (Carolin)","valor":5419.6},{"nome":"Escola dos filhos","valor":8210.25},{"nome":"Atividades Filhos","valor":480.0},{"nome":"Educação Filhos","valor":370.0},{"nome":"Financiamento Imobiliário","valor":3261.66},{"nome":"Condomínio (PAG TIT 409998)","valor":3258.27},{"nome":"Condomínio (BKI RIO)","valor":748.8},{"nome":"Esporte (quadra+prof+personal)","valor":2510.0},{"nome":"Funcionários/Serviços","valor":700.0},{"nome":"Energia – Light","valor":1375.95},{"nome":"Gás – CEG","valor":535.24},{"nome":"Internet/Tel – Vivo","valor":564.79},{"nome":"E-Social","valor":666.5},{"nome":"Impostos & Taxas","valor":613.68},{"nome":"Saúde – Clínica","valor":0},{"nome":"Educação & Trabalho","valor":1000.0},{"nome":"Tarifa Bancária Bradesco","valor":87.0},{"nome":"IOF","valor":24.1},{"nome":"DARF","valor":0},{"nome":"DETRAN RJ","valor":0},{"nome":"Taxa Bombeiro","valor":0},{"nome":"Outros PIX enviados","valor":984.44},{"nome":"Outros","valor":85.0}],"total":30895.28},"saldo":3654.48},{"mes":"Maio","ano":2026,"receitas":{"salario":52647.58,"dividendos":21532.32,"pj_andressa":6400.0,"outros":572.81,"total":81152.71},"cartoes":{"itau":5513.22,"xp":28988.12,"total":34501.34},"viagens":[{"destino":"Macaé","valor":483.93},{"destino":"Itaipava","valor":499.5}],"fixos":{"items":[{"nome":"Babá (Carolin)","valor":2400.0},{"nome":"Escola dos filhos","valor":8210.25},{"nome":"Atividades Filhos","valor":0},{"nome":"Educação Filhos","valor":0},{"nome":"Financiamento Imobiliário","valor":3259.58},{"nome":"Condomínio (PAG TIT 409998)","valor":3703.59},{"nome":"Condomínio (BKI RIO)","valor":748.8},{"nome":"Esporte (quadra+prof+personal)","valor":810.0},{"nome":"Funcionários/Serviços","valor":920.0},{"nome":"Energia – Light","valor":1279.98},{"nome":"Gás – CEG","valor":490.07},{"nome":"Internet/Tel – Vivo","valor":589.79},{"nome":"E-Social","valor":0},{"nome":"Impostos & Taxas","valor":2033.03},{"nome":"Saúde – Clínica","valor":710.0},{"nome":"Educação & Trabalho","valor":0},{"nome":"Tarifa Bancária Bradesco","valor":0},{"nome":"IOF","valor":97.37},{"nome":"DARF","valor":0},{"nome":"DETRAN RJ","valor":0},{"nome":"Taxa Bombeiro","valor":0},{"nome":"Outros PIX enviados","valor":406.5},{"nome":"Outros PIX enviados","valor":82.0}],"total":25740.96},"saldo":19926.98}],"investimentos":{"data_ref":"31/03/2026","patrimonio":308005.23,"rentabilidade_mes":-2.09,"rentabilidade_ano":1.05,"rentabilidade_12m":10.61,"rentabilidade_24m":20.7,"composicao":[{"estrategia":"Pós Fixado","valor":191440.26,"pct":62.15},{"estrategia":"Inflação","valor":85440.09,"pct":27.74},{"estrategia":"Multimercado","valor":31124.87,"pct":10.11}]}};
-const DEFAULT_CAT={"Mercado & Alimentação":{"jan":8405.28,"fev":11630.53,"mar":7650.13,"abr":5672.78,"mai":7036.23},"Restaurantes & Delivery":{"jan":4703.79,"fev":7293.24,"mar":5286.42,"abr":4577.87,"mai":6754.51},"Compras Online":{"jan":3499.74,"fev":2647.85,"mar":1669.95,"abr":1405.6,"mai":3091.09},"Vestuário & Calçados":{"jan":4882.71,"fev":4456.36,"mar":4966.58,"abr":3500.91,"mai":4101.2},"Lazer & Entretenimento":{"jan":2099.16,"fev":1409.59,"mar":1355.91,"abr":541.36,"mai":1823.45},"Saúde & Beleza":{"jan":2076.5,"fev":1605.2,"mar":4844.89,"abr":1441.23,"mai":2858.22},"Transporte & Combustível":{"jan":900.87,"fev":743.85,"mar":907.98,"abr":825.19,"mai":1093.86},"Estacionamento":{"jan":358.7,"fev":252.6,"mar":329.29,"abr":439.77,"mai":601.52},"Bem-estar & Fitness":{"jan":606.37,"fev":387.69,"mar":326.64,"abr":490.54,"mai":0},"Assinaturas":{"jan":721.22,"fev":760.57,"mar":933.44,"abr":1568.19,"mai":1229.31},"Educação & Trabalho":{"jan":86.23,"fev":343.11,"mar":867.38,"abr":648.3,"mai":742.68},"Educação Filhos":{"jan":1441.56,"fev":1258.14,"mar":1641.98,"abr":1180.87,"mai":1180.87},"Viagens":{"jan":1680.86,"fev":8771.95,"mar":898.8,"abr":26234.11,"mai":2787.95},"Carro":{"jan":7850.11,"fev":7908.81,"mar":408.82,"abr":408.82,"mai":408.82},"Presente":{"jan":632.65,"fev":1104.07,"mar":1598.7,"abr":592.81,"mai":1344.72},"Impostos & Taxas":{"jan":59.67,"fev":2.89,"mar":2.92,"abr":1218.93,"mai":2.71},"Outros":{"jan":3320.04,"fev":4269.15,"mar":1280.29,"abr":976.87,"mai":190.0},"Atividades Filhos":{"jan":0,"fev":0,"mar":0,"abr":0,"mai":0},"Vinhos & Cerveja":{"jan":0,"fev":0,"mar":0,"abr":0,"mai":369.5},"Funcionários/Serviços":{"jan":0,"fev":0,"mar":0,"abr":0,"mai":1000.9},"Casa & Manutenção":{"jan":496.73,"fev":620.18,"mar":673.4,"abr":431.7,"mai":671.75}};
-
-// Dados de transações comprimidos
-const TX_META = {"meses":["Abril","Fevereiro","Janeiro","Maio","Março"],"cats":["Assinaturas","Bem-estar & Fitness","Carro","Compras Online","Educação & Trabalho","Educação Filhos","Estacionamento","Funcionários/Serviços","Impostos & Taxas","Lazer & Entretenimento","Mercado & Alimentação","Outros","Presente","Restaurantes & Delivery","Saúde & Beleza","Transporte & Combustível","Vestuário & Calçados","Viagens","Vinhos & Cerveja","Casa & Manutenção"],"cartoes":["Itaú","XP"]};
-const TX_RAW = [["21/04/2025","ASICS - LOJA BARRA10/10",16,0,120.08,1],["21/05/2025","DECATHLON   -CT   09/10",16,0,80.33,1],["22/05/2025","BOTTEGA VENETA VIL09/10",16,0,1339.0,1],["22/07/2025","AMAZONMKTPLC*ZIDIN07/10",3,0,6.98,1],["22/07/2025","AMAZON MARKETPLACE07/10",3,0,7.39,1],["22/07/2025","AMAZONMKTPLC*HOMEC07/10",3,0,23.8,1],["22/07/2025","CENTAURO CE20     07/08",16,0,100.06,1],["22/07/2025","AMAZONMKTPLC*DISTR07/10",3,0,30.4,1],["12/08/2025","AMAZONMKTPLC*CANEL07/10",3,0,112.73,1],["19/08/2025","MERCADOLIVRE*6PROD06/06",10,0,44.4,1],["21/08/2025","SEPHORA RIO -CT GN06/06",16,0,59.5,1],["09/09/2025","TUDIN LIMPIN      06/06",19,0,153.33,1],["11/09/2025","AMERICAN AIR*captu06/06",17,0,782.06,1],["12/09/2025","DECATHLON   -CT   06/07",16,0,107.18,1],["13/09/2025","DECATHLON         06/06",16,0,100.0,1],["18/09/2025","7017  BARRA -CT PI05/05",11,0,133.6,1],["22/09/2025","AMAZON BR         05/06",3,0,38.35,1],["24/09/2025","Zara Home Brazil  05/05",16,0,113.16,1],["24/09/2025","asicsbr-2648804   05/08",16,0,50.16,1],["24/10/2025","456 RIO DESI-CT AR04/06",11,0,94.16,1],["24/10/2025","Zara Home Brazil  04/05",16,0,231.92,1],["25/11/2025","AMAZONMKTPLC*MYTOY03/03",5,0,77.27,1],["01/12/2025","AMAZONMKTPLC*PRAIA03/08",14,0,83.08,1],["01/12/2025","AMAZONMKTPLC*GAMEL03/04",3,0,45.02,1],["18/12/2025","USA STAR          02/02",2,0,7500.0,1],["18/12/2025","RAGAVE            02/03",11,0,223.34,1],["04/01/2026","AMAZON MARKETPLACE02/03",3,0,85.01,1],["04/01/2026","AMAZON MARKETPLACE",3,0,0.02,1],["14/01/2026","TUDIN LIMPIN",19,0,0.1,1],["14/01/2026","TUDIN LIMPIN      02/06",19,0,118.35,1],["18/01/2026","APPLE.COM/BILL",0,0,66.9,1],["18/01/2026","APPLE.COM/BILL",0,0,29.9,1],["19/01/2026","Uber UBER *TRIP HELP.U",15,0,39.97,1],["20/01/2026","APPLE.COM/BILL",0,0,66.9,1],["24/01/2026","Uber UBER *TRIP HELP.U",15,0,117.99,1],["24/01/2026","Uber UBER *TRIP HELP.U",15,0,7.11,1],["24/01/2026","Uber UBER *TRIP HELP.U",15,0,45.09,1],["25/01/2026","MERCADOLIVRE*3PRODUTOS",10,0,155.72,1],["27/01/2026","MERCADOLIVRE*PAULINHO",10,0,44.52,1],["28/01/2026","Google One",0,0,14.99,1],["29/01/2026","SEM PARAR",6,0,232.6,1],["29/01/2026","APPLE.COM/BILL",0,0,9.9,1],["29/01/2026","TUDIN LIMPIN      01/06",19,0,123.35,1],["30/01/2026","APPLE.COM/BILL",0,0,99.9,1],["02/02/2026","MERCADOLIVRE*MERCADOLI",10,0,78.0,1],["02/02/2026","AMAZONMKTPLC*ZIZIM01/03",3,0,179.62,1],["03/02/2026","IFOOD CLUB",13,0,12.9,1],["04/02/2026","MERCADOLIVRE*3PRODUTO",10,0,138.79,1],["04/02/2026","Disney Plus",0,0,44.5,1],["04/02/2026","AMAZON BR         01/02",3,0,168.94,1],["04/02/2026","MERCADOLIVRE*PIACAVA",10,0,31.09,1],["05/02/2026","Uber UBER *TRIP HELP.U",15,0,63.99,1],["06/02/2026","AMAZON PRIME*7W3B75DL3",0,0,83.19,1],["06/02/2026","APPLECOMBILL",0,0,29.9,1],["06/02/2026","Google One",0,0,9.99,1],["07/02/2026","IOF COMPRA INTERNACIONA",8,0,2.89,1],["09/02/2026","Uber UBER *TRIP HELP.U",15,0,20.98,1],["13/02/2026","APPLECOMBILL",0,0,99.9,1],["17/02/2026","Uber UBER *TRIP HELP.U",15,0,72.5,1],["22/10/2025","MAPLE BEAR STORE",5,1,853.37,1],["23/10/2025","LILIBEE     *LILIBEE",5,1,327.5,1],["25/10/2025","AMAZONMKTPLC*CANELLASS",3,1,63.99,1],["27/10/2025","ORTOBOM",1,1,129.84,1],["02/11/2025","LEGO BARRA",12,1,109.99,1],["05/11/2025","ESTOK DISTRIBUID",19,1,225.05,1],["05/11/2025","EVENTIM     *EVENTIM",9,1,474.0,1],["05/11/2025","EVENTIM     *EVENTIM",9,1,188.0,1],["05/11/2025","EVENTIM     *EVENTIM",9,1,180.0,1],["07/11/2025","ZARA HOME BRAZIL",16,1,319.98,1],["16/11/2025","TICKET*AQUARIO*-*AQUAR",9,1,145.66,1],["22/11/2025","TOY BOY",12,1,115.22,1],["23/11/2025","RAIADROGASILSA",14,1,117.43,1],["25/11/2025","CLUB MED",17,1,898.8,1],["04/12/2025","EC *LINUS",11,1,132.0,1],["10/12/2025","BPG IGUATEMI*IGUA",11,1,103.07,1],["14/12/2025","LUDIQUE ET BADIN",12,1,162.49,1],["21/12/2025","SEPHORA RIO DESIGN",16,1,153.5,1],["21/12/2025","FOXTON RDB CM",16,1,308.4,1],["21/12/2025","MF RDB CM",16,1,268.6,1],["23/12/2025","MP*MERCADOLIVRE",10,1,78.54,1],["23/12/2025","ZONA SUL FL 23",10,1,1060.79,1],["26/12/2025","RAIA DROGASIL SA",14,1,115.52,1],["26/12/2025","DECATHLON",16,1,168.31,1],["26/12/2025","RAIA2765",14,1,207.05,1],["29/12/2025","ZARA BRASIL LTDA",16,1,201.6,1],["30/12/2025","NACAO RUBRO NEGRA",12,1,89.99,1],["02/01/2026","RI HAPPY BRINQUE",12,1,86.01,1],["04/01/2026","30109  RIO DESIGN BARR",11,1,107.98,1],["05/01/2026","EC *GROWTHSUPPLEMENTS",1,1,61.05,1],["08/01/2026","PG *NUVEM SANTOLA",3,1,57.46,1],["08/01/2026","KALUNGA.COM",3,1,38.47,1],["09/01/2026","TOY BOY",12,1,68.95,1],["10/01/2026","ZARA BRASIL LTDA",16,1,203.2,1],["13/01/2026","AMAZON MARKETPLACE",3,1,47.18,1],["14/01/2026","CAFETERIA CHEZ LOUIZ",10,1,4.0,1],["14/01/2026","MEGA ARABE CAFE E EVEN",10,1,10.0,1],["14/01/2026","IFD*CITTA DELIRIO RESTAUR",13,1,110.69,1],["14/01/2026","IFOOD",13,1,8.98,1],["14/01/2026","MEGA ARABE CAFE E EVEN",10,1,20.0,1],["14/01/2026","METRO RJ",15,1,7.9,1],["15/01/2026","PEIXE DO JOO",11,1,359.07,1],["15/01/2026","AMERICANAS S A",3,1,93.58,1],["15/01/2026","DM*SPOTIFY",0,1,40.9,1],["15/01/2026","AMERICANAS S A",3,1,117.44,1],["16/01/2026","MUDAVENDING",3,1,33.87,1],["16/01/2026","ESPACO CAJU",13,1,76.0,1],["16/01/2026","LATAM AIR*0000",17,1,5648.7,1],["16/01/2026","AMAZONPRIMEBR",3,1,19.9,1],["16/01/2026","RESTAURANTE ALFAIA",13,1,181.17,1],["16/01/2026","BAR E RESTAURANTE IMACU",13,1,77.28,1],["16/01/2026","LATAM AIR*0000",17,1,1442.39,1],["16/01/2026","KATSZU BAR",13,1,564.48,1],["17/01/2026","RAPPIBR_SAFE",13,1,38.33,1],["17/01/2026","SUPER MERCADO ZONA SUL",10,1,47.83,1],["17/01/2026","AMERICANAS S A",3,1,10.25,1],["17/01/2026","AMERICANAS S A",3,1,302.83,1],["17/01/2026","IFD*TT BURGER ALIMENTOS L",13,1,141.69,1],["18/01/2026","NETFLIX.COM",0,1,59.9,1],["18/01/2026","MP*POINTDANIELMO",3,1,20.0,1],["18/01/2026","IFD*FORNERIA ORIGINAL",13,1,24.24,1],["18/01/2026","ZONA SUL FL 23",10,1,314.99,1],["18/01/2026","IFD*DELITROP RESTAURANTE",13,1,252.48,1],["19/01/2026","RGE COMERCIO DE A",4,1,88.37,1],["19/01/2026","ZONA SUL FL 23",10,1,813.61,1],["19/01/2026","LEONARDO VIEIRA DE BRI",11,1,42.0,1],["19/01/2026","ALMENDRA B E R LTDA",11,1,157.4,1],["19/01/2026","ZARA BRASIL LTDA",16,1,214.0,1],["20/01/2026","AMAZON BR",3,1,77.21,1],["20/01/2026","RGE COMERCIO DE A",4,1,74.34,1],["20/01/2026","DL*DLRAPPIPROBR",13,1,24.9,1],["20/01/2026","POSTO BIG RIO",15,1,312.82,1],["21/01/2026","RENNER",16,1,165.74,1],["21/01/2026","FONTAINE DE SANTE ALIME",10,1,50.42,1],["21/01/2026","IFD*NANNAI SUSHI LTDA",13,1,61.94,1],["21/01/2026","EVORA REST",11,1,16.0,1],["21/01/2026","BS ACAI",11,1,8.1,1],["22/01/2026","DL*DLRAPPI BR",13,1,48.39,1],["22/01/2026","DROGARIAS PACHECO SA",14,1,55.65,1],["22/01/2026","HORTIFRUTI BARRA",10,1,424.74,1],["22/01/2026","METRO RJ",15,1,7.9,1],["22/01/2026","RGE COMERCIO DE A",4,1,94.72,1],["22/01/2026","RAIA2765",14,1,249.99,1],["22/01/2026","MUDAVENDING",3,1,35.97,1],["23/01/2026","IFD*FERRO BARRA PIZZARIA",13,1,106.98,1],["23/01/2026","LU RECH STUDIO",11,1,90.0,1],["23/01/2026","ABM PADARIA",10,1,66.0,1],["23/01/2026","PDV*COMERCIO VAREJ",3,1,128.0,1],["23/01/2026","CAFETERIA CHEZ LOUIZ",10,1,2.0,1],["23/01/2026","INDITEX BRASIL LT",11,1,9.0,1],["23/01/2026","IFD*JM BARRA COMERCIO",13,1,45.89,1],["23/01/2026","00046  SH BARRA RIO JA",11,1,149.78,1],["23/01/2026","DROGARIA PEGALE",14,1,93.47,1],["24/01/2026","PURA BRASA",13,1,118.16,1],["24/01/2026","BACIODILATTE",13,1,40.9,1],["24/01/2026","MINI GOLFE EMPREENDIMEN",11,1,138.0,1],["24/01/2026","METRO RJ",15,1,7.9,1],["24/01/2026","BACIODILATTE-LJ3042",13,1,47.9,1],["25/01/2026","ZONA SUL FL 23",10,1,340.57,1],["25/01/2026","IFD*DCD BRASA BURGER L",13,1,108.99,1],["25/01/2026","IFD*RAMALHOS SERVICOS  LT",13,1,136.98,1],["25/01/2026","IFD*LOUCO DELIVERY COM",13,1,60.18,1],["25/01/2026","AMERICANAS S A",3,1,106.89,1],["26/01/2026","IFD*ABM PADARIA E CONF",10,1,49.99,1],["26/01/2026","RAIA DROGASIL SA",14,1,129.61,1],["26/01/2026","IFD*LOUCO DELIVERY COM",13,1,63.88,1],["26/01/2026","BIBI SUCOS",13,1,119.9,1],["27/01/2026","ZONA SUL FL 23",10,1,458.37,1],["27/01/2026","CLUB MEN SALON - BARRA",14,1,75.0,1],["27/01/2026","MUDAVENDING",3,1,13.58,1],["27/01/2026","CONEXAO ARTE",13,1,139.18,1],["27/01/2026","HORTIFRUTI BARRA",10,1,227.78,1],["27/01/2026","NVTBARRACOMERCIO",11,1,324.9,1],["27/01/2026","BANCA DOIS IRMAOS",11,1,7.9,1],["27/01/2026","VINDI  *STARGARDENUNIF",1,1,196.8,1],["28/01/2026","ABM PADARIA",10,1,28.0,1],["28/01/2026","QUICK GALETOS",13,1,69.2,1],["28/01/2026","YUJO",13,1,241.92,1],["28/01/2026","ESTACIONAMENTO",15,1,16.0,1],["28/01/2026","NUTRISAUDE",11,1,7.99,1],["28/01/2026","ESPACO CAJU",13,1,229.0,1],["29/01/2026","RESTAURANTE ALFAIA",13,1,272.55,1],["29/01/2026","ZONA SUL VTEX 17",10,1,206.87,1],["29/01/2026","PG *WIX MAPLE BARRA",3,1,62.0,1],["29/01/2026","CANTINA SABOR AMIGO",13,1,6.0,1],["29/01/2026","LYON",11,1,33.0,1],["29/01/2026","IFD*LOUCO DELIVERY COM",13,1,79.38,1],["30/01/2026","RGE COMERCIO DE A",4,1,85.68,1],["30/01/2026","MUDAVENDING",3,1,56.86,1],["30/01/2026","SUPER MERCADO ZONA SUL",10,1,227.4,1],["30/01/2026","SERVIA O DE MANOBRA",11,1,25.0,1],["30/01/2026","BUSINESS RIO COMERCIO",11,1,451.36,1],["30/01/2026","IFD*DP1 RESTAURANTE LT",13,1,40.89,1],["30/01/2026","INGRESSOCOM",9,1,65.93,1],["31/01/2026","ADIDAS",12,1,125.02,1],["31/01/2026","LUDIQUE ET BADIN",12,1,142.67,1],["31/01/2026","DELIRIO TROPICAL",13,1,245.0,1],["31/01/2026","HOTZONE BRS",9,1,100.0,1],["31/01/2026","HOTZONE BRS",9,1,53.0,1],["31/01/2026","HOTZONE BRS",9,1,203.0,1],["31/01/2026","ZONA SUL FL 22",10,1,170.75,1],["01/02/2026","IFD*FERRO BARRA PIZZARIA",13,1,112.98,1],["01/02/2026","IFD*MARSAL BAR E RESTAURA",13,1,288.49,1],["01/02/2026","MUDAVENDING",3,1,42.46,1],["01/02/2026","MP*OMESSIAS",10,1,20.0,1],["01/02/2026","MUDAVENDING",3,1,19.98,1],["02/02/2026","ZS PIZZARIA 1012",13,1,48.1,1],["02/02/2026","LEAD AMERICAS",6,1,20.0,1],["02/02/2026","SUPER MERCADO ZONA SUL",10,1,841.44,1],["02/02/2026","ZONA SUL FL 23",10,1,999.35,1],["02/02/2026","RAIA2765",14,1,73.37,1],["02/02/2026","SUPER MERCADO ZONA SUL",10,1,841.44,1],["03/02/2026","AMAZONMKTPLC*UTILIBROX",3,1,25.9,1],["03/02/2026","YSALKO COMERCIO D",11,1,67.8,1],["03/02/2026","ANIMASOM PRODUCOES E EV",11,1,130.0,1],["03/02/2026","CAFETERIA CHEZ LOUIZ",10,1,7.5,1],["04/02/2026","QUEIJ FINOS S MINAS",10,1,270.0,1],["04/02/2026","IFD*ABM PADARIA E CONF",10,1,45.39,1],["04/02/2026","RI HAPPY BRINQUEDOS S/",12,1,55.24,1],["05/02/2026","HARU SUSHI COPA",13,1,256.06,1],["05/02/2026","IFD*DCD BRASA BURGER L",13,1,60.89,1],["05/02/2026","BARRAVEST UNIFORMES",11,1,144.7,1],["05/02/2026","DECATHLON",16,1,151.64,1],["06/02/2026","MARIA BACANA",11,1,32.97,1],["06/02/2026","ASSAI ATACADISTA",10,1,456.79,1],["06/02/2026","DELIRIO TROPICAL",13,1,191.6,1],["06/02/2026","ESPACO CAJU",13,1,76.0,1],["06/02/2026","62857350EMANOELLE",11,1,15.0,1],["06/02/2026","62857350EMANOELLE",11,1,20.0,1],["06/02/2026","GABBIANO TRATTORIA",13,1,526.96,1],["06/02/2026","GALETO SAT S COPACABANA",13,1,57.3,1],["07/02/2026","IFD*MJD BARRA DELIVERY LT",13,1,98.49,1],["07/02/2026","RAIA2765",14,1,108.39,1],["07/02/2026","KALUNGA ENC",3,1,89.22,1],["07/02/2026","RI HAPPY BRINQUEDOS S/",12,1,148.49,1],["07/02/2026","YELUMSEG PARC2",2,1,350.01,1],["07/02/2026","METRO RJ",15,1,7.9,1],["08/02/2026","IFD*RAMALHOS SERVICOS  LT",13,1,45.99,1],["08/02/2026","IFD*ALMANARA RESTAURANTES",13,1,208.78,1],["08/02/2026","MARCUS ANDRE SOAR",11,1,50.0,1],["08/02/2026","IFD*ABM PADARIA E CONF",10,1,172.78,1],["08/02/2026","ZONA SUL FL 23",10,1,153.64,1],["08/02/2026","IFD*TT BURGER ALIMENTOS L",13,1,269.29,1],["09/02/2026","AMAZON PRIME CANAIS",0,1,27.9,1],["09/02/2026","CRUZADA DA BARRA",13,1,323.14,1],["09/02/2026","SUPER MERCADO ZONA SUL",10,1,211.34,1],["09/02/2026","BALADA MIX",13,1,93.17,1],["09/02/2026","MOCELLIN STEAK",13,1,61.5,1],["10/02/2026","RAPPIBR_SAFE",13,1,19.38,1],["10/02/2026","YELUMSEG PARC1",2,1,58.8,1],["10/02/2026","IG*ETIQUETAUNIC",11,1,361.75,1],["10/02/2026","PARADOSI",11,1,164.08,1],["10/02/2026","SUPER MERCADO ZONA SUL",10,1,72.86,1],["11/02/2026","FONTAINE DE SANTE ALIME",10,1,55.44,1],["11/02/2026","AMAZON BR",3,1,68.29,1],["11/02/2026","JIM.COM* MISSISSIPI",11,1,60.0,1],["12/02/2026","RAPPIBR_SAFE",13,1,38.34,1],["12/02/2026","METRO RJ",15,1,7.9,1],["12/02/2026","ZIG*BREWTECO GAVEA",13,1,31.36,1],["12/02/2026","RAKUNA LANCHES",13,1,165.0,1],["12/02/2026","EBN    *CANVA04790 40",0,1,35.0,1],["12/02/2026","SUPER MERCADO ZONA SUL",10,1,1.24,1],["12/02/2026","SUPER MERCADO ZONA SUL",10,1,383.76,1],["12/02/2026","BRASEIRO DA GAVEA",13,1,47.0,1],["12/02/2026","CAFETERIA CHEZ LOUIZ",10,1,7.5,1],["13/02/2026","HARU SUSHI COPA",13,1,240.5,1],["13/02/2026","MP*LOCUSSALAODEB",3,1,174.0,1],["13/02/2026","ZONA SUL FL 23",10,1,1000.0,1],["13/02/2026","MARCIOLUISDASILVA",11,1,35.0,1],["13/02/2026","MUDAVENDING",3,1,39.17,1],["13/02/2026","ABM PADARIA",10,1,48.0,1],["13/02/2026","SUPER MERCADO ZONA SUL",10,1,65.51,1],["13/02/2026","SUPER MERCADO ZONA SUL",10,1,16.16,1],["13/02/2026","LU RECH STUDIO",11,1,40.0,1],["13/02/2026","ZONA SUL FL 23",10,1,636.97,1],["13/02/2026","PDV*COMERCIO VAREJ",3,1,61.3,1],["13/02/2026","GERMANS DIST COMESTIVEI",10,1,54.01,1],["13/02/2026","DROGARIA PEGALE - 5100",14,1,102.5,1],["13/02/2026","SUPER MERCADO ZONA SUL",10,1,36.75,1],["14/02/2026","MP*POINTDANIELMO",3,1,50.0,1],["14/02/2026","CREPES BOM PROFIT",13,1,5.0,1],["14/02/2026","METRO RJ",15,1,7.9,1],["14/02/2026","CATIAREGINA",11,1,17.0,1],["14/02/2026","CREPES BOM PROFIT",13,1,18.0,1],["15/02/2026","DM*SPOTIFY",0,1,40.9,1],["15/02/2026","MP*POINTDANIELMO",3,1,50.0,1],["15/02/2026","SUPER MERCADO ZONA SUL",10,1,36.08,1],["15/02/2026","RAIA DROGASIL SA",14,1,194.14,1],["16/02/2026","AMAZONPRIMEBR",3,1,19.9,1],["16/02/2026","DL*DLRAPPI BR",13,1,41.29,1],["16/02/2026","MAMMA JAMMA",11,1,117.4,1],["16/02/2026","MUDAVENDING",3,1,23.89,1],["16/02/2026","SUPER MERCADO ZONA SUL",10,1,49.77,1],["17/02/2026","SUPER MERCADO ZONA SUL",10,1,51.64,1],["17/02/2026","IFD*LOUCO DELIVERY COM",13,1,172.28,1],["17/02/2026","WILSON SALOMON",11,1,399.8,1],["07/01/2025","PORTO SEGURO SEGUROS",11,0,81.32,2],["21/04/2025","ASICS - LOJA BARRA09/10",16,0,120.08,2],["21/05/2025","DECATHLON   -CT   08/10",16,0,80.33,2],["22/05/2025","BOTTEGA VENETA VIL08/10",16,0,1339.0,2],["28/05/2025","AMAZON MARKETPLACE08/08",3,0,119.49,2],["22/07/2025","AMAZONMKTPLC*DISTR06/10",3,0,30.4,2],["22/07/2025","CENTAURO CE20     06/08",16,0,100.06,2],["22/07/2025","AMAZONMKTPLC*HOMEC06/10",3,0,23.8,2],["22/07/2025","AMAZON MARKETPLACE06/10",3,0,7.39,2],["22/07/2025","AMAZONMKTPLC*ZIDIN06/10",3,0,6.98,2],["12/08/2025","AMAZONMKTPLC*CANEL06/10",3,0,112.73,2],["19/08/2025","MERCADOLIVRE*6PROD05/06",10,0,44.4,2],["21/08/2025","Zara Brasil LTDA  05/05",16,0,101.8,2],["21/08/2025","SEPHORA RIO -CT GN05/06",16,0,59.5,2],["09/09/2025","TUDIN LIMPIN      05/06",19,0,153.33,2],["11/09/2025","AMERICAN AIR*captu05/06",17,0,782.06,2],["12/09/2025","DECATHLON   -CT   05/07",16,0,107.18,2],["13/09/2025","DECATHLON         05/06",16,0,100.0,2],["18/09/2025","7017  BARRA -CT PI04/05",11,0,133.6,2],["22/09/2025","AMAZON BR         04/06",3,0,38.35,2],["24/09/2025","asicsbr-2648804   04/08",16,0,50.16,2],["24/09/2025","Zara Home Brazil  04/05",16,0,113.16,2],["07/10/2025","AMAZON MARKETPLACE04/04",3,0,160.91,2],["24/10/2025","RENNER            03/03",16,0,83.27,2],["24/10/2025","456 RIO DESI-CT AR03/06",11,0,94.16,2],["24/10/2025","ZP          *ELO7 03/03",11,0,202.64,2],["24/10/2025","Zara Home Brazil  03/05",16,0,231.92,2],["24/10/2025","AMAZON BR         03/03",3,0,123.38,2],["25/10/2025","Zara Brasil LTDA  03/03",16,0,56.0,2],["27/10/2025","AMAZON MARKETPLACE03/03",3,0,146.44,2],["04/11/2025","AMAZON BR         03/03",3,0,226.05,2],["20/11/2025","AMAZON BR",3,0,0.01,2],["20/11/2025","AMAZON BR         02/02",3,0,106.24,2],["25/11/2025","AMAZONMKTPLC*MYTOYUTIL",5,0,0.02,2],["25/11/2025","AMAZONMKTPLC*MYTOY02/03",5,0,77.27,2],["01/12/2025","AMAZONMKTPLC*PRAIANEGO",14,0,0.35,2],["01/12/2025","AMAZONMKTPLC*GAMEL02/04",3,0,45.02,2],["01/12/2025","AMAZONMKTPLC*GAMELANDI",3,0,0.09,2],["01/12/2025","AMAZONMKTPLC*PRAIA02/08",14,0,83.08,2],["03/12/2025","AMAZON MARKETPLACE02/02",3,0,72.37,2],["11/12/2025","AMAZON MARKETPLACE02/02",3,0,111.81,2],["11/12/2025","AMAZON MARKETPLACE",3,0,0.01,2],["12/12/2025","AMAZONMKTPLC*KRTOY02/02",5,0,121.45,2],["18/12/2025","RAGAVE",11,0,0.02,2],["18/12/2025","APPLE.COM/BILL",0,0,29.9,2],["18/12/2025","Uber UBER *TRIP HELP.U",15,0,89.98,2],["18/12/2025","USA STAR          01/02",2,0,7500.0,2],["18/12/2025","APPLE.COM/BILL",0,0,66.9,2],["18/12/2025","RAGAVE            01/03",11,0,223.34,2],["18/12/2025","Uber UBER *TRIP HELP.U",15,0,12.95,2],["19/12/2025","APPLE.COM/BILL",0,0,29.9,2],["20/12/2025","MERCADOLIVRE*MERCADOL",10,0,86.19,2],["20/12/2025","APPLE.COM/BILL",0,0,66.9,2],["22/12/2025","Uber UBER *TRIP HELP.U",15,0,153.76,2],["23/12/2025","MERCADOLIVRE*MERCADOL",10,0,26.82,2],["23/12/2025","Uber UBER *TRIP HELP.U",15,0,27.46,2],["28/12/2025","Google One",0,0,14.99,2],["29/12/2025","SEM PARAR",6,0,315.3,2],["30/12/2025","Uber UBER *TRIP HELP.U",15,0,31.51,2],["30/12/2025","APPLE.COM/BILL",0,0,99.9,2],["03/01/2026","IFOOD CLUB",13,0,12.9,2],["04/01/2026","Disney Plus",0,0,44.5,2],["04/01/2026","AMAZON MARKETPLACE01/03",3,0,85.01,2],["06/01/2026","AMAZON PRIME*LG70S06Z3",0,0,85.74,2],["06/01/2026","PICPAY*MundialJardim",10,0,1210.21,2],["06/01/2026","APPLE.COM/BILL",0,0,29.9,2],["06/01/2026","Google One",0,0,9.99,2],["07/01/2026","IOF COMPRA INTERNACIONA",8,0,2.97,2],["13/01/2026","AMAZON BR",3,0,32.89,2],["13/01/2026","AMAZON BR",3,0,147.57,2],["13/01/2026","AMAZON BR",3,0,82.9,2],["13/01/2026","APPLE.COM/BILL",0,0,99.9,2],["14/01/2026","TUDIN LIMPIN      01/06",19,0,118.35,2],["16/01/2026","APPLE.COM/BILL",0,0,19.9,2],["22/10/2025","MAPLE BEAR STORE",5,1,853.37,2],["23/10/2025","LILIBEE     *LILIBEE",5,1,327.5,2],["25/10/2025","AMAZONMKTPLC*CANELLASS",3,1,63.99,2],["27/10/2025","ORTOBOM",1,1,129.84,2],["02/11/2025","LEGO BARRA",12,1,109.99,2],["05/11/2025","EVENTIM     *EVENTIM",9,1,474.0,2],["05/11/2025","EVENTIM     *EVENTIM",9,1,188.0,2],["05/11/2025","ESTOK DISTRIBUID",19,1,225.05,2],["05/11/2025","EVENTIM     *EVENTIM",9,1,180.0,2],["07/11/2025","ZARA HOME BRAZIL",16,1,319.98,2],["14/11/2025","ROSE MARKET LTDA EPP",16,1,379.8,2],["16/11/2025","TICKET*AQUARIO*-*AQUAR",9,1,145.66,2],["22/11/2025","TOY BOY",12,1,115.22,2],["23/11/2025","RAIADROGASILSA",14,1,117.43,2],["24/11/2025","JULIAHELENA",14,1,575.0,2],["25/11/2025","CLUB MED",17,1,898.8,2],["25/11/2025","AREZZO INDUSTRIA",16,1,151.95,2],["04/12/2025","EC *LINUS",11,1,132.0,2],["06/12/2025","DROGARIA VENANCIO",14,1,233.86,2],["08/12/2025","BANCA KIDS COMERCIO DE",5,1,61.95,2],["10/12/2025","BPG IGUATEMI*IGUA",11,1,900.0,2],["10/12/2025","BPG IGUATEMI*IGUA",11,1,103.07,2],["14/12/2025","RI RAPPY",11,1,84.99,2],["14/12/2025","LUDIQUE ET BADIN",12,1,162.49,2],["17/12/2025","WIND SUCOS",13,1,133.55,2],["17/12/2025","RAPPIBR_SAFE",13,1,24.9,2],["17/12/2025","IFD*ABM PADARIA E CONF",10,1,113.19,2],["17/12/2025","AMERICANAS S A",3,1,124.58,2],["17/12/2025","IFD*ABM PADARIA E CONF",10,1,61.79,2],["17/12/2025","AMERICANAS S A",3,1,124.58,2],["18/12/2025","RAPPIBR_SAFE",13,1,51.78,2],["18/12/2025","MARESIASBARE",13,1,15.0,2],["18/12/2025","ZONA SUL",10,1,549.99,2],["18/12/2025","AMERICANAS S A",3,1,181.16,2],["18/12/2025","NETFLIX.COM",0,1,59.9,2],["18/12/2025","IZAR BAZAR E RESTAURAN",13,1,270.0,2],["18/12/2025","JIM.COM* CLAYTON RONALDO",11,1,30.0,2],["19/12/2025","IFD*FERRO BARRA PIZZARIA",13,1,106.98,2],["19/12/2025","SUPER MERCADO ZONA SUL",10,1,361.96,2],["19/12/2025","BARRA SHOPPING",6,1,10.5,2],["19/12/2025","IFD*VIA PALATTO PADARI",13,1,22.18,2],["19/12/2025","HOTZONE BRS",9,1,153.0,2],["19/12/2025","IFD*AAG AFFONSO COMERCIO",13,1,216.38,2],["19/12/2025","DL*DLRAPPI BR",13,1,157.25,2],["19/12/2025","BARRA SHOPPING",6,1,32.9,2],["19/12/2025","QUEIJ FINOS S MINAS",10,1,200.0,2],["19/12/2025","SUPER MERCADO ZONA SUL",10,1,361.96,2],["19/12/2025","SUPER MERCADO ZONA SUL",10,1,77.76,2],["19/12/2025","METRO RJ",15,1,7.9,2],["19/12/2025","BACIODILATTE-LJ3022",13,1,65.85,2],["19/12/2025","HARU SUSHI COPA",13,1,260.0,2],["20/12/2025","CINEMARK VILLAGE MALL",9,1,87.0,2],["20/12/2025","CINEMARK VILLAGE MALL",9,1,25.0,2],["20/12/2025","IFD*ABM PADARIA E CONF",10,1,37.19,2],["20/12/2025","SUPER MERCADO ZONA SUL",10,1,81.49,2],["20/12/2025","AMERICANAS S A",3,1,41.37,2],["20/12/2025","DENGO",11,1,68.99,2],["20/12/2025","RAIA DROGASIL SA",14,1,114.59,2],["20/12/2025","INGRESSO.COM",9,1,490.5,2],["20/12/2025","DIS COM DE PERFUMARIA E",16,1,106.9,2],["21/12/2025","IFD*TT BURGER ALIMENTOS L",13,1,176.68,2],["21/12/2025","RAIA DROGASIL SA",14,1,214.06,2],["21/12/2025","SEPHORA RIO DESIGN",16,1,153.5,2],["21/12/2025","FOXTON RDB CM",16,1,308.4,2],["21/12/2025","MF RDB CM",16,1,268.6,2],["22/12/2025","PORTUGO",13,1,12.0,2],["22/12/2025","POSTO DE GASOLINA BARR",15,1,316.51,2],["22/12/2025","ABM PADARIA",10,1,70.0,2],["22/12/2025","RAIA DROGASIL SA",14,1,123.99,2],["22/12/2025","IFD*VIA PALATTO PADARI",13,1,40.82,2],["22/12/2025","ESPACO CAJU",13,1,76.0,2],["22/12/2025","POSTO DE GASOLINA BARR",15,1,50.0,2],["22/12/2025","SUPER MERCADO ZONA SUL",10,1,87.69,2],["22/12/2025","MP*LOCUSSALAODEB",3,1,132.0,2],["22/12/2025","IFD*LOUCO DELIVERY COM",13,1,70.78,2],["23/12/2025","IFD*SBB DELIVERY BARRA DA",13,1,141.79,2],["23/12/2025","NA BRASA PEPE",13,1,108.68,2],["23/12/2025","MARCUS ANDRE SOAR",11,1,140.0,2],["23/12/2025","SUPER MERCADO ZONA SUL",10,1,70.28,2],["23/12/2025","XEPA",10,1,76.0,2],["23/12/2025","SUPER MERCADO ZONA SUL",10,1,74.2,2],["23/12/2025","ZS PIZZARIA 1023",13,1,99.0,2],["23/12/2025","IFD*SJR COMERCIO DE CH",13,1,141.39,2],["23/12/2025","ZONA SUL FL 23",10,1,1060.79,2],["23/12/2025","MP*MERCADOLIVRE",10,1,78.61,2],["24/12/2025","MUDAVENDING",3,1,43.26,2],["24/12/2025","MP*POINTDANIELMO",3,1,60.0,2],["24/12/2025","IFD*RDM PIZZARIA LTDA",13,1,44.99,2],["24/12/2025","IFD*LOUCO DELIVERY COM",13,1,239.28,2],["24/12/2025","ABM PADARIA",10,1,19.0,2],["24/12/2025","GERMANS DIST COMESTIVEI",10,1,76.16,2],["24/12/2025","AVENUE HOCHE COMERCIO",11,1,68.65,2],["24/12/2025","ZP*CAROLINA 61570",11,1,300.0,2],["25/12/2025","IFD*VIA PALATTO PADARI",13,1,20.67,2],["25/12/2025","IFD*FERRO BARRA PIZZAR",13,1,118.98,2],["25/12/2025","Estorno de Encargos de Refinanciamento",11,1,109.69,2],["25/12/2025","Estorno IOF",8,1,56.7,2],["25/12/2025","Estorno de Multa",11,1,274.69,2],["25/12/2025","Estorno Juros de Mora",11,1,18.31,2],["26/12/2025","COSECHAS FREEWAY",13,1,14.0,2],["26/12/2025","MP*LOTERIASONLINENFA1",9,1,216.0,2],["26/12/2025","COSECHAS FREEWAY",13,1,14.0,2],["26/12/2025","ZONA SUL FL 23",10,1,910.28,2],["26/12/2025","THE BALLOONS LTDA",11,1,103.45,2],["26/12/2025","MP*POINTDANIELMO",3,1,104.0,2],["26/12/2025","AMERICANAS S A",3,1,156.03,2],["26/12/2025","PDV*COMERCIO VAREJ",3,1,188.1,2],["26/12/2025","IFD*VIA PALATTO PADARI",13,1,26.05,2],["26/12/2025","ESTACIONAMENTO",15,1,8.0,2],["26/12/2025","IFD*ABM PADARIA E CONF",10,1,117.18,2],["26/12/2025","IFD*TT BURGER ALIMENTOS L",13,1,173.68,2],["26/12/2025","RAIA DROGASIL SA",14,1,115.52,2],["26/12/2025","DECATHLON",16,1,168.32,2],["26/12/2025","RAIA2765",14,1,207.06,2],["29/12/2025","ZARA BRASIL LTDA",16,1,78.0,2],["29/12/2025","ZARA BRASIL LTDA",16,1,201.6,2],["30/12/2025","MP*LUANARIBEIROS",3,1,30.0,2],["30/12/2025","CALEBITO",10,1,104.0,2],["30/12/2025","DROGARIAS PACHECO SA",14,1,221.56,2],["30/12/2025","NACAO RUBRO NEGRA",12,1,89.99,2],["02/01/2026","AMERICANAS S A",3,1,237.88,2],["02/01/2026","ATILARODRIGUES",11,1,33.0,2],["02/01/2026","62857350EMANOELLE",11,1,8.0,2],["02/01/2026","NAGA ALIMENTOS",13,1,461.06,2],["02/01/2026","PEDRAS ASPETRO",10,1,241.97,2],["02/01/2026","RI HAPPY BRINQUE",12,1,86.01,2],["03/01/2026","DEPOSITO DO MARCOLA",10,1,29.0,2],["04/01/2026","30109  RIO DESIGN BARR",11,1,107.99,2],["04/01/2026","IFD*LOUCO DELIVERY COM",13,1,107.98,2],["04/01/2026","IFD*ABM PADARIA E CONF",10,1,77.39,2],["04/01/2026","GALETO RAINHA BAR",13,1,377.0,2],["05/01/2026","HORTIFRUTI PRADO",10,1,41.55,2],["05/01/2026","ZONA SUL FL 23",10,1,546.83,2],["05/01/2026","EC *GROWTHSUPPLEMENTS",1,1,61.06,2],["06/01/2026","ZONA SUL FL 23",10,1,279.84,2],["06/01/2026","IFD*SJR COMERCIO DE CH",13,1,71.94,2],["07/01/2026","PARKING BARRA SQUARE",15,1,15.0,2],["07/01/2026","BIBI SUCOS",13,1,72.9,2],["07/01/2026","IFD*DELITROP RESTAURANTE",13,1,82.48,2],["07/01/2026","IFD*CITTA DELIRIO RESTAUR",13,1,156.49,2],["07/01/2026","YELUMSEG PARC1",2,1,350.11,2],["07/01/2026","IFD*FIT DE FATO DISTRIBUI",13,1,131.39,2],["08/01/2026","PG *NUVEM SANTOLA",3,1,57.47,2],["08/01/2026","METRO RJ",15,1,7.9,2],["08/01/2026","CAFETERIA CHEZ LOUIZ",10,1,4.0,2],["08/01/2026","SUPER MERCADO ZONA SUL",10,1,67.59,2],["08/01/2026","NEW LIFE LANCHES LTDA",11,1,56.0,2],["08/01/2026","KALUNGA.COM",3,1,38.48,2],["09/01/2026","AMAZON PRIME CANAIS",0,1,27.9,2],["09/01/2026","ZONA SUL FL 23",10,1,150.71,2],["09/01/2026","SUPER MERCADO ZONA SUL",10,1,63.04,2],["09/01/2026","SUPER MERCADO ZONA SUL",10,1,37.83,2],["09/01/2026","CAFETERIA CHEZ LOUIZ",10,1,8.0,2],["09/01/2026","AQUARIUS BARRA",9,1,140.0,2],["09/01/2026","BOULANGERIE",10,1,70.0,2],["09/01/2026","SUPER MERCADO ZONA SUL",10,1,146.93,2],["09/01/2026","TOY BOY",12,1,68.95,2],["10/01/2026","MP*POINTDANIELMO",3,1,20.0,2],["10/01/2026","METRO RJ",15,1,7.9,2],["10/01/2026","FREE WAY WASH",15,1,100.0,2],["10/01/2026","IFD*RAMALHOS SERVICOS  LT",13,1,68.98,2],["10/01/2026","SUCOS E SANDU",13,1,224.22,2],["10/01/2026","ZARA BRASIL LTDA",16,1,203.2,2],["11/01/2026","SUPER MERCADO ZONA SUL",10,1,41.18,2],["11/01/2026","ALLPARK EMPREENDIMENTOS,",15,1,36.0,2],["11/01/2026","ALLPARK EMPREENDIMENTOS,",15,1,36.0,2],["11/01/2026","IFD*ABM PADARIA E CONF",10,1,128.18,2],["11/01/2026","RAPPIBR_SAFE",13,1,72.65,2],["12/01/2026","HORTIFRUTI BARRA",10,1,499.1,2],["12/01/2026","DL*DLRAPPI BR",13,1,21.14,2],["12/01/2026","EBN*CANVA04759 30",0,1,35.0,2],["12/01/2026","RGE COMERCIO DE A",4,1,86.23,2],["13/01/2026","AMERICANAS S A",3,1,149.82,2],["13/01/2026","TVN NATURAL PRIME COMER",10,1,15.0,2],["13/01/2026","MUDAVENDING",3,1,19.98,2],["13/01/2026","VINDI  *ALEXANDRIONEXP",1,1,415.47,2],["13/01/2026","MARCIOLUISDASILVA",11,1,46.13,2],["13/01/2026","BARBUDUS",14,1,70.0,2],["13/01/2026","AMAZON MARKETPLACE",3,1,47.2,2],["01/03/2026","RAPPIBR_SAFE",13,1,58.8,4],["01/03/2026","RAIA DROGASIL SA",14,1,287.63,4],["01/03/2026","IFD*ABM PADARIA E CONFEIT",10,1,97.99,4],["01/03/2026","MUDAVENDING",3,1,4.99,4],["01/03/2026","MUDAVENDING",3,1,2.49,4],["01/03/2026","MUDAVENDING",3,1,4.98,4],["01/03/2026","CANTINA SABOR AMIGO",13,1,16.0,4],["01/03/2026","IFD*FERRO BARRA PIZZARIA",13,1,113.98,4],["02/01/2026","RI HAPPY BRINQUE",12,1,86.01,4],["02/03/2026","CRUZADA DA BARRA",13,1,150.0,4],["02/03/2026","BIBI SUCOS",13,1,61.9,4],["02/03/2026","W. CARE",14,1,700.0,4],["02/03/2026","TVN NATURAL PRIME COMER",10,1,15.0,4],["02/03/2026","BARBUDUS",14,1,70.0,4],["02/03/2026","FREE WAY WASH",15,1,80.0,4],["02/03/2026","APART CAR ESTACIONAMENT",6,1,31.0,4],["02/03/2026","PG *MESA VENTURES CICC",4,1,253.8,4],["02/03/2026","HNT COMERCIO HORT",10,1,591.8,4],["02/03/2026","NUTRISAUDE",11,1,120.58,4],["02/11/2025","LEGO BARRA",12,1,109.99,4],["03/03/2026","CANTINA SABOR AMIGO",13,1,8.0,4],["03/03/2026","MUDAVENDING",3,1,4.29,4],["03/03/2026","DROGARIAS PACHECO",14,1,63.08,4],["03/03/2026","CANTINA SABOR AMIGO",13,1,8.0,4],["03/03/2026","PG *111 STUDIO CO",4,1,124.85,4],["04/01/2026","30109  RIO DESIGN BARR",3,1,107.98,4],["04/03/2026","IFD*DCD BRASA BURGER L",13,1,114.26,4],["05/02/2026","DECATHLON",16,1,151.64,4],["05/02/2026","BARRAVEST UNIFORMES",11,1,144.7,4],["05/03/2026","HNT COMERCIO HORT",10,1,208.96,4],["05/03/2026","CAFE GO",10,1,7.0,4],["05/03/2026","BRASA PORTENA",13,1,75.93,4],["05/03/2026","ELETTRICA COMERCIO DE R",11,1,116.22,4],["05/03/2026","CAFE GO",10,1,28.0,4],["05/03/2026","RSV RJ BARRA SHOPPING",11,1,216.0,4],["05/03/2026","INDITEX BRASIL LTDA",16,1,125.5,4],["05/03/2026","IFD*MJD BARRA DELIVERY LT",13,1,116.39,4],["05/11/2025","ESTOK DISTRIBUID",19,1,225.05,4],["06/03/2026","RAPPIBR_SAFE",13,1,19.34,4],["06/03/2026","PORTUGO",13,1,36.0,4],["06/03/2026","ESPACO CAJU",13,1,76.0,4],["06/03/2026","HNT COMERCIO HORT",10,1,226.63,4],["06/03/2026","CASA 94",14,1,1096.0,4],["06/03/2026","SUPER MERCADO ZONA SUL",10,1,212.37,4],["06/03/2026","348 VILA OLIMPIA",11,1,273.79,4],["06/03/2026","SUPER MERCADO ZONA SUL",10,1,483.42,4],["06/03/2026","VIDAL PARKING MANOBRIS",6,1,35.0,4],["06/03/2026","RESTAURANTE FCMBR LTDA",13,1,159.46,4],["07/02/2026","RAIA2765",14,1,108.38,4],["07/03/2026","LU RECH STUDIO",11,1,289.0,4],["07/03/2026","LINKER LTDA",3,1,50.0,4],["07/03/2026","YELUMSEG PARC3",2,1,350.01,4],["07/03/2026","ABM PADARIA",10,1,18.0,4],["07/03/2026","HENRIQUE SCHAUMANN",4,1,56.3,4],["07/03/2026","DROGARIA PEGALE - 5100",14,1,23.46,4],["07/03/2026","VACA VEIA ITAIM",13,1,200.0,4],["07/03/2026","ICA*ICASEI PRESENTES",12,1,497.98,4],["07/03/2026","MERCADOLIVRE*OESPECIAL",10,1,19.9,4],["07/11/2025","ZARA HOME BRAZIL",16,1,319.98,4],["08/01/2026","KALUNGA.COM",3,1,38.47,4],["08/03/2026","IFD*GALLO DA VILA PRAI",13,1,204.8,4],["08/03/2026","MILENA GUSMAO PINHO",4,1,65.0,4],["08/03/2026","IFD*TT BURGER ALIMENTOS L",13,1,228.26,4],["08/03/2026","IFD*MILANO COMERCIO VA",13,1,94.93,4],["09/03/2026","PADDLE.NET* CHATONPAY",0,1,3.68,4],["09/03/2026","CAFETERIA CHEZ LOUIZ",10,1,12.0,4],["09/03/2026","CLAUDE.AI SUBSCRIPTION",0,1,3.85,4],["09/03/2026","HNT COMERCIO HORT",10,1,488.36,4],["09/03/2026","PADDLE.NET* CHATONPAY",0,1,105.09,4],["09/03/2026","CLAUDE.AI SUBSCRIPTION",0,1,110.0,4],["09/03/2026","RAIA2765",14,1,211.3,4],["09/03/2026","BEEP SAUDE",14,1,110.53,4],["09/03/2026","AMAZON PRIME CANAIS",0,1,27.9,4],["10/01/2026","ZARA BRASIL LTDA",16,1,203.2,4],["10/03/2026","CENTAURO COM BR",16,1,120.39,4],["10/03/2026","POSTO DE GASOLINA BARR",15,1,200.0,4],["10/03/2026","YELUMSEG PARC2",2,1,58.81,4],["10/12/2025","BPG IGUATEMI*IGUA",3,1,103.07,4],["11/03/2026","KORAL RESTAURANTE",13,1,286.86,4],["11/03/2026","EVORADELI",10,1,9.9,4],["11/03/2026","HNT LOJA - A015 -",10,1,460.43,4],["11/03/2026","IFD*LOUCO DELIVERY COM",13,1,71.38,4],["11/03/2026","TUDIN LIMPIN",19,1,206.65,4],["12/03/2026","CAFETERIA CHEZ LOUIZ",10,1,2.0,4],["12/03/2026","EBN*CANVA04818 37",0,1,35.0,4],["12/03/2026","CSB DROGARIAS S A",14,1,45.4,4],["12/03/2026","IFD*DENGO CHOCOLATES S.A.",13,1,101.88,4],["12/03/2026","METRO RJ",15,1,7.9,4],["13/01/2026","AMAZON MARKETPLACE",3,1,47.18,4],["13/02/2026","DROGARIA PEGALE - 5100",14,1,102.49,4],["13/03/2026","EMPORIO JARDIM",10,1,24.0,4],["13/03/2026","METRO RJ",15,1,7.9,4],["13/03/2026","RAIA2765",14,1,242.89,4],["13/03/2026","AMAZON BR",3,1,19.9,4],["13/03/2026","IFD*CLARK PATISSERIE CONF",13,1,55.89,4],["13/03/2026","MP*LOTERIASONLINEG0YZ",9,1,210.0,4],["13/03/2026","MLP*NETSHOES NETS",3,1,100.02,4],["13/03/2026","FOXTON BARRA SHOP CM",16,1,113.14,4],["13/03/2026","IFD*FERRO BARRA PIZZARIA",13,1,92.99,4],["14/03/2026","TVN NATURAL PRIME COMER",10,1,60.0,4],["14/03/2026","MP*LOTERIASONLINEFN1R",9,1,42.0,4],["14/03/2026","IFD*EHBP COMERCIO DE ALIM",13,1,56.97,4],["14/03/2026","HNT LOJA - A015 -",10,1,119.99,4],["14/03/2026","IFD*LOUCO DELIVERY COMEST",13,1,142.61,4],["14/12/2025","LUDIQUE ET BADIN",12,1,162.49,4],["15/03/2026","PROFITVALETPARK",6,1,35.0,4],["15/03/2026","DM*SPOTIFY",0,1,40.9,4],["15/03/2026","MP*LOTERIASONLINEN9HP",9,1,36.0,4],["15/03/2026","DROGARIAS PACHECO",14,1,89.9,4],["15/03/2026","KORAL RESTAURANTE",13,1,508.85,4],["15/03/2026","DROGARIAS PACHECO",14,1,142.52,4],["15/03/2026","IFD*TT BURGER ALIMENTOS L",13,1,168.59,4],["16/03/2026","DROGARIAS PACHECO",14,1,21.98,4],["16/03/2026","RAIA2765",14,1,39.79,4],["16/03/2026","IFD*BANG 2024 RESTAURA",13,1,30.39,4],["16/03/2026","DROGARIAS PACHECO",14,1,245.53,4],["16/03/2026","DROGARIAS PACHECO",14,1,179.8,4],["16/03/2026","TOY BOY",12,1,169.4,4],["16/03/2026","HNT LOJA - A015 -",10,1,418.12,4],["16/03/2026","CLUB MEN SALON - BARRA",14,1,75.0,4],["16/03/2026","MAGIC HAIR",14,1,40.0,4],["16/03/2026","DROGARIAS PACHECO",14,1,11.18,4],["17/02/2026","ZIG    *RIO OPEN 2026 CA",9,1,300.0,4],["17/02/2026","ZIG    *RIO OPEN 2026",9,1,200.0,4],["18/02/2026","DL*DLRAPPI BR",13,1,30.45,4],["18/02/2026","NETFLIX ENTRETENIMENTO",0,1,59.9,4],["19/01/2026","ZARA BRASIL LTDA",16,1,214.0,4],["19/02/2026","MUDAVENDING",3,1,4.99,4],["19/02/2026","SUPER MERCADO ZONA SUL",10,1,157.58,4],["19/02/2026","BANG 2024 RESTAURANTE",13,1,72.9,4],["19/02/2026","MUDAVENDING",3,1,19.98,4],["19/02/2026","CAFETERIA CHEZ LOUIZ",10,1,4.0,4],["19/02/2026","INDITEX BRASIL LTDA",16,1,165.2,4],["20/02/2026","SUPER MERCADO ZONA SUL",10,1,203.91,4],["20/02/2026","IFD*ABM PADARIA E CONF",10,1,90.78,4],["20/02/2026","SUPER MERCADO ZONA SUL",10,1,555.26,4],["20/02/2026","RAIA DROGASIL SA",14,1,97.09,4],["20/02/2026","CERVANTES",13,1,119.04,4],["20/02/2026","MUDAVENDING",3,1,5.59,4],["20/02/2026","MP*LOTERIASONLINEMH2M",9,1,222.0,4],["20/02/2026","INDITEX BRASIL LTDA",16,1,129.5,4],["20/02/2026","IFD*FERRO BARRA PIZZARIA",13,1,119.48,4],["21/01/2026","RENNER",16,1,165.74,4],["21/02/2026","IFD*CITTA DELIRIO RESTAUR",13,1,160.98,4],["21/02/2026","MARCUS ANDRE SOAR",11,1,120.0,4],["21/02/2026","FILA BR N AMERICA",16,1,56.66,4],["21/02/2026","ZIG    *RIO OPEN 2026",9,1,120.0,4],["21/02/2026","ZIG    *RIO OPEN 2026",9,1,30.0,4],["21/02/2026","ZIG    *RIO OPEN 2026",9,1,130.0,4],["21/12/2025","MF RDB CM",16,1,268.6,4],["21/12/2025","FOXTON RDB CM",16,1,308.4,4],["22/02/2026","SUPER MERCADO ZONA SUL",10,1,189.39,4],["22/02/2026","MP*DAVIDJOSEMART",3,1,10.0,4],["22/02/2026","MP*DAVIDJOSEMART",3,1,15.0,4],["22/02/2026","RAPPIBR_SAFE",13,1,15.92,4],["22/10/2025","MAPLE BEAR STORE",5,1,853.37,4],["22/11/2025","TOY BOY",12,1,115.22,4],["23/01/2026","DROGARIA PEGALE",14,1,93.47,4],["23/01/2026","00046  SH BARRA RIO JA",3,1,149.76,4],["23/02/2026","RGE COMERCIO DE A",4,1,97.73,4],["23/02/2026","HNT COMERCIO HORT",10,1,523.83,4],["23/02/2026","LUIZA BARCELOS LOJA ONL",16,1,122.73,4],["23/10/2025","LILIBEE     *LILIBEE",5,1,327.5,4],["23/12/2025","MP*MERCADOLIVRE",10,1,78.54,4],["23/12/2025","ZONA SUL FL 23",10,1,1060.79,4],["24/02/2026","SUPER MERCADO ZONA SUL",10,1,319.4,4],["24/02/2026","SUPER MERCADO ZONA SUL",10,1,2.07,4],["24/02/2026","BERNARDO TEIXEIRA SAMP",4,1,269.7,4],["25/02/2026","HNT COMERCIO HORT",10,1,178.47,4],["25/02/2026","SOLIDA NUTRICAO",14,1,12.0,4],["25/02/2026","IFD*MJD BARRA DELIVERY LT",13,1,121.39,4],["25/10/2025","AMAZONMKTPLC*CANELLASS",3,1,63.99,4],["25/11/2025","CLUB MED",17,1,898.8,4],["26/02/2026","RAIA DROGASIL SA",14,1,69.77,4],["26/02/2026","MUDAVENDING",3,1,33.96,4],["26/12/2025","RAIA2765",14,1,207.05,4],["26/12/2025","RAIA DROGASIL SA",14,1,115.52,4],["26/12/2025","DECATHLON",16,1,168.31,4],["27/01/2026","VINDI  *STARGARDENUNIF",1,1,196.8,4],["27/02/2026","SUPER MERCADO ZONA SUL",10,1,182.28,4],["27/02/2026","IFD*BURGERS BARRA COME",13,1,40.98,4],["27/02/2026","IFD*DENGO CHOCOLATES S.A.",13,1,92.88,4],["27/02/2026","HARU SUSHI COPA",13,1,196.62,4],["27/02/2026","LEME LIGHT",13,1,30.0,4],["27/02/2026","BRINK CENTER",12,1,99.98,4],["27/10/2025","ORTOBOM",1,1,129.84,4],["28/02/2026","TVN NATURAL PRIME COMER",10,1,23.0,4],["28/02/2026","METRO RJ",15,1,7.9,4],["28/02/2026","MUDAVENDING",3,1,19.98,4],["28/02/2026","IFD*CITTA DELIRIO RESTAUR",13,1,163.99,4],["28/02/2026","TVN NATURAL PRIME COMER",10,1,37.0,4],["29/12/2025","ZARA BRASIL LTDA",16,1,201.6,4],["30/01/2026","INGRESSOCOM",9,1,65.91,4],["30/12/2025","NACAO RUBRO NEGRA",12,1,89.99,4],["31/01/2026","ADIDAS",12,1,124.99,4],["31/01/2026","LUDIQUE ET BADIN",12,1,142.65,4],["2026-03-17","RAPPI*Super Mercado Zo",10,0,93.85,4],["2026-03-16","MERCADOLIVRE*MERCADOL",10,0,40.23,4],["2026-03-16","AmazonPrimeBR",3,0,19.9,4],["2026-03-15","RAPPI*CSB DROGARIAS S",14,0,260.05,4],["2026-03-14","RAPPI  *RAPPI BRASIL I",13,0,58.86,4],["2026-03-13","APPLECOMBILL",0,0,99.9,4],["2026-03-11","Uber UBER *TRIP HELP.U",15,0,61.89,4],["2026-03-07","UBER* TRIP",13,0,46.08,4],["2026-03-07","UBER* TRIP",13,0,115.97,4],["2026-03-07","IOF COMPRA INTERNACIONA",8,0,2.92,4],["2026-03-07","Uber UBER *TRIP HELP.U",15,0,26.96,4],["2026-03-07","UBER* TRIP",13,0,132.97,4],["2026-03-07","Uber UBER *TRIP HELP.U",15,0,55.59,4],["2026-03-07","UBER* TRIP",13,0,113.94,4],["2026-03-07","Uber UBER *TRIP HELP.U",15,0,18.98,4],["2026-03-06","DL          *UberRides",13,0,57.95,4],["2026-03-06","APPLECOMBILL",0,0,29.9,4],["2026-03-06","AMAZON PRIME*JA1OH9MU3",0,0,84.24,4],["2026-03-06","UBER* TRIP",13,0,16.68,4],["2026-03-06","Google One",0,0,9.99,4],["2026-03-06","Uber UBER *TRIP HELP.U",15,0,32.13,4],["2026-03-06","MERCADOLIVRE*MGPARTS",10,0,189.9,4],["2026-03-05","MERCADOLIVRE*GUYLHERM",10,0,215.98,4],["2026-03-05","UBER* TRIP",13,0,88.22,4],["2026-03-04","Disney Plus",0,0,44.5,4],["2026-03-04","AMAZON MARKETPLACE01/02",3,0,171.76,4],["2026-03-03","IFD*IFOOD CLUB",13,0,12.9,4],["2026-02-28","Google One",0,0,14.99,4],["2026-02-28","APPLECOMBILL",0,0,99.9,4],["2026-02-27","AMAZONMKTPLC*WEBMUSICS",3,0,41.99,4],["2026-02-26","SEM PARAR",6,0,228.29,4],["2026-02-25","DL          *UberRides",13,0,194.86,4],["2026-02-25","Uber UBER *TRIP HELP.U",15,0,69.97,4],["2026-02-25","Uber UBER *TRIP HELP.U",15,0,52.85,4],["2026-02-25","AMAZONMKTPLC*GFFCOMPAN",3,0,16.9,4],["2026-02-23","AMAZONMKTPLC*NATAL01/03",5,0,281.49,4],["2026-02-22","Uber UBER *TRIP HELP.U",15,0,34.99,4],["2026-02-22","Uber UBER *TRIP HELP.U",15,0,30.0,4],["2026-02-22","Uber UBER *TRIP HELP.U",15,0,50.0,4],["2026-02-21","DL*DLRAPPIPROBR",13,0,24.9,4],["2026-02-21","Uber UBER *TRIP HELP.U",15,0,61.98,4],["2026-02-21","Uber UBER *TRIP HELP.U",15,0,49.97,4],["2026-02-20","APPLECOMBILL",0,0,66.9,4],["2026-02-18","APPLECOMBILL",0,0,29.9,4],["2026-02-18","APPLECOMBILL",0,0,66.9,4],["2026-02-17","Uber UBER *TRIP HELP.U",15,0,58.97,4],["2026-02-04","AMAZON BR         02/02",3,0,168.94,4],["2026-02-02","AMAZONMKTPLC*ZIZIM02/03",5,0,179.62,4],["2026-01-29","TUDIN LIMPIN      02/06",19,0,123.35,4],["2026-01-14","TUDIN LIMPIN      03/06",19,0,118.35,4],["2026-01-04","AMAZON MARKETPLACE03/03",3,0,85.01,4],["2025-12-18","RAGAVE            03/03",16,0,223.34,4],["2025-12-01","AMAZONMKTPLC*PRAIA04/08",14,0,83.08,4],["2025-12-01","AMAZONMKTPLC*GAMEL04/04",3,0,45.02,4],["2025-10-24","Zara Home Brazil  05/05",16,0,231.92,4],["2025-10-24","456 RIO DESI-CT AR05/06",3,0,94.16,4],["2025-09-24","asicsbr-2648804   06/08",16,0,50.16,4],["2025-09-22","AMAZON BR         06/06",3,0,38.35,4],["2025-09-12","DECATHLON   -CT   07/07",16,0,107.18,4],["2025-08-12","AMAZONMKTPLC*CANEL08/10",3,0,112.73,4],["2025-07-22","AMAZONMKTPLC*DISTR08/10",3,0,30.4,4],["2025-07-22","AMAZONMKTPLC*HOMEC08/10",3,0,23.8,4],["2025-07-22","AMAZONMKTPLC*ZIDIN08/10",3,0,6.98,4],["2025-07-22","CENTAURO CE20     08/08",16,0,100.06,4],["2025-07-22","AMAZON MARKETPLACE08/10",3,0,7.39,4],["2025-05-22","BOTTEGA VENETA VIL10/10",16,0,1339.0,4],["2025-05-21","DECATHLON   -CT   10/10",16,0,80.33,4],["01/04/2026","CLAUDE.AI SUBSCRIPTION",0,1,3.85,0],["01/04/2026","CAFETERIA CHEZ LOUIZ",10,1,4.0,0],["01/04/2026","BUTEKU LIDOS BISTRO",13,1,64.11,0],["01/04/2026","YUJO",13,1,256.48,0],["01/04/2026","CAFETERIA CHEZ LOUIZ",10,1,12.0,0],["01/04/2026","METRO RJ",15,1,7.9,0],["01/04/2026","CLAUDE.AI SUBSCRIPTION",0,1,110.0,0],["02/03/2026","NUTRISAUDE",11,1,120.58,0],["02/04/2026","IFD*TT BURGER ALIMENTO",13,1,153.68,0],["02/04/2026","METRO RJ",15,1,7.9,0],["02/04/2026","PRINCESSA DA BARRA",6,1,287.07,0],["02/04/2026","UBER * PENDING",15,1,23.97,0],["02/11/2025","LEGO BARRA",12,1,109.99,0],["03/03/2026","PG *111 STUDIO CO",4,1,124.84,0],["03/04/2026","W B M JORNAIS E REVIST",11,1,67.8,0],["03/04/2026","METRO RJ",15,1,7.9,0],["03/04/2026","IFD*DENGO CHOCOLATES S",11,1,146.68,0],["03/04/2026","BONDAI",13,1,33.6,0],["03/04/2026","ZONA SUL FL 23",10,1,363.72,0],["03/04/2026","IFD*FERRO BARRA PIZZAR",13,1,94.99,0],["04/01/2026","30109  RIO DESIGN BARR",3,1,107.98,0],["04/04/2026","IFD*MILANO COMERCIO VAREJ",13,1,96.93,0],["04/04/2026","IFD*HNT COMERCIO HORTI",10,1,174.38,0],["04/04/2026","IFD*CLARK PATISSERIE C",13,1,334.89,0],["05/02/2026","DECATHLON",16,1,151.64,0],["05/03/2026","RSV RJ BARRA SHOPPING",11,1,216.0,0],["05/03/2026","INDITEX BRASIL LTDA",16,1,125.5,0],["05/04/2026","PG *LEMME CICCLO ESPOR",4,1,253.8,0],["05/11/2025","ESTOK DISTRIBUID",19,1,225.05,0],["06/04/2026","AMAZON MARKETPLACE",3,1,84.28,0],["06/04/2026","EBN*MCAFEE",0,1,83.0,0],["07/02/2026","RAIA2765",14,1,108.38,0],["07/03/2026","MERCADOLIVRE*OESPECIAL",10,1,19.9,0],["07/04/2026","YELUMSEG PARC4",2,1,350.01,0],["07/04/2026","METRO RJ",15,1,7.9,0],["07/04/2026","IFD*VIA PALATTO PADARI",13,1,23.0,0],["07/04/2026","IFD*DCD BRASA BURGER LANC",13,1,112.26,0],["08/01/2026","KALUNGA.COM",3,1,38.47,0],["08/04/2026","METRO RJ",15,1,7.9,0],["08/04/2026","HNT LOJA - A015 -",10,1,516.17,0],["09/03/2026","RAIA2765",14,1,211.3,0],["09/03/2026","BEEP SAUDE",14,1,110.51,0],["09/04/2026","AMAZON PRIME CANAIS",0,1,34.9,0],["09/04/2026","CLAUDE.AI SUBSCRIPTION",0,1,3.85,0],["09/04/2026","HARU SUSHI COPA",13,1,251.61,0],["09/04/2026","MUDAVENDING",3,1,27.98,0],["09/04/2026","CLAUDE.AI SUBSCRIPTION",0,1,110.0,0],["10/01/2026","ZARA BRASIL LTDA",16,1,203.2,0],["10/04/2026","UBER * PENDING",15,1,33.98,0],["10/04/2026","YELUMSEG PARC3",2,1,58.81,0],["10/04/2026","VINDI  *PANORESORTWEAR",1,1,163.9,0],["10/04/2026","WALTER S RIO DESING",14,1,463.0,0],["10/04/2026","KATSZU BAR",13,1,350.0,0],["10/04/2026","BARRA BOWLING GRILL",6,1,152.7,0],["10/04/2026","METRO RJ",15,1,7.9,0],["10/04/2026","BOTECO BROTINHO DE COP",13,1,295.68,0],["10/04/2026","IFD*BURGERS BARRA COME",13,1,43.99,0],["10/04/2026","BOTECO BROTINHO DE COP",13,1,234.08,0],["10/04/2026","AMAZONMKTPLC*VIVAMARSU",3,1,93.7,0],["10/04/2026","AMAZONMKTPLC*PRATITOLT",3,1,29.45,0],["10/12/2025","BPG IGUATEMI*IGUA",3,1,103.07,0],["11/03/2026","TUDIN LIMPIN",19,1,206.65,0],["11/04/2026","MCAFEE CS3821",0,1,89.0,0],["12/04/2026","IFD*ABM PADARIA E CONF",10,1,45.39,0],["12/04/2026","MARCUS ANDRE SOAR",11,1,70.0,0],["12/04/2026","ZONA SUL FL 23",10,1,333.34,0],["12/04/2026","POSTO DE GASOLINA BARR",15,1,316.57,0],["12/04/2026","ZONA SUL FL 23",10,1,288.95,0],["12/04/2026","IFD*TT BURGER ALIMENTO",13,1,141.79,0],["12/04/2026","EBN    *CANVA04849 25",0,1,35.0,0],["13/01/2026","AMAZON MARKETPLACE",3,1,47.18,0],["13/03/2026","FOXTON BARRA SHOP CM",16,1,113.13,0],["13/03/2026","MLP*NETSHOES NETS",3,1,99.99,0],["13/04/2026","IGUASPO*IGUASPORT LTDA",9,1,103.45,0],["13/04/2026","CLAUDE.AI SUBSCRIPTION",0,1,1003.57,0],["13/04/2026","CLAUDE.AI SUBSCRIPTION",0,1,35.12,0],["13/04/2026","UBER * PENDING",15,1,24.98,0],["14/04/2026","ZP*BANCODOBRASIL",8,1,1218.93,0],["14/04/2026","MP*LOTERIASONLINEAZLJ",9,1,204.0,0],["14/04/2026","CANTINA SABOR AMIGO",13,1,8.0,0],["14/04/2026","MUDAVENDING",3,1,23.88,0],["14/04/2026","METRO RJ",15,1,7.9,0],["14/04/2026","HNT LOJA - A015 -",10,1,264.62,0],["15/03/2026","DROGARIAS PACHECO",14,1,142.51,0],["17/03/2026","BKG*BOOKING.COM HOTEL",17,1,4887.66,0],["17/03/2026","TVN NATURAL PRIME COMER",10,1,62.5,0],["17/03/2026","BKG*BOOKING.COM HOTEL",17,1,171.07,0],["17/03/2026","IFD*FORNERIA ORIGINAL JAR",13,1,41.49,0],["17/03/2026","MP*LOTERIASONLINEFI0W",9,1,168.0,0],["17/03/2026","IFD*ABM PADARIA E CONF",10,1,48.38,0],["18/03/2026","ZARA BRASIL LTDA",16,1,331.0,0],["18/03/2026","IFD*DENGO CHOCOLATES S",11,1,106.7,0],["18/03/2026","RAIA2765",14,1,240.75,0],["18/03/2026","CONEXAO ARTE",13,1,69.68,0],["18/03/2026","NETFLIX.COM",0,1,59.9,0],["18/03/2026","ZARA BRASIL LTDA",16,1,166.0,0],["19/02/2026","INDITEX BRASIL LTDA",16,1,165.2,0],["19/03/2026","LU RECH STUDIO",11,1,90.0,0],["19/03/2026","LATAM AIR*KUHNNC",17,1,820.29,0],["19/03/2026","ZONA SUL FL 23",10,1,949.58,0],["19/03/2026","NEW LIFE LANCHES LTDA",11,1,83.31,0],["19/03/2026","ZONA SUL FL 23",10,1,900.0,0],["19/03/2026","MARCIOLUISDASILVA",11,1,75.8,0],["19/03/2026","GERMANS DIST COMESTIVEI",10,1,39.04,0],["19/03/2026","ASSIST CARD DO BRASIL",17,1,77.76,0],["19/03/2026","ASSIST CARD DO BRASIL",17,1,103.69,0],["20/02/2026","INDITEX BRASIL LTDA",16,1,129.5,0],["20/03/2026","EC*TICKETMASTER",17,1,625.98,0],["20/03/2026","IG*CCNMULTIPLAC",3,1,219.1,0],["20/03/2026","IFD*TT BURGER ALIMENTO",13,1,79.69,0],["20/03/2026","HNT LOJA - A015 -",10,1,56.04,0],["20/03/2026","METRO RJ",15,1,7.9,0],["20/03/2026","BPC5 - GALEAO",17,1,41.7,0],["21/01/2026","RENNER",16,1,165.74,0],["21/02/2026","FILA BR N AMERICA",16,1,56.66,0],["21/03/2026","MOSAICO KITCHEN+BAR",17,1,77.86,0],["21/03/2026","BOOKING.COM HOTEL",17,1,9560.62,0],["21/03/2026","MOSAICO KITCHEN+BAR",17,1,105.73,0],["21/03/2026","MIAMIBCH PARKING METER",17,1,60.47,0],["21/03/2026","MP*LOCUSSALAODEB",3,1,150.0,0],["21/03/2026","MUDAVENDING",3,1,17.97,0],["21/03/2026","PDV*COMERCIO VAREJ",3,1,88.8,0],["21/03/2026","MOSAICO KITCHEN+BAR",17,1,3.7,0],["21/03/2026","ESPACO CAJU",13,1,76.0,0],["21/03/2026","MOSAICO KITCHEN+BAR",17,1,2.73,0],["21/03/2026","ESTACIONAMENTO",15,1,16.0,0],["21/03/2026","AUTO SERVICO ROCAR RIO",15,1,346.49,0],["21/03/2026","IFD*LEVE MIRIN LTDA",13,1,198.61,0],["21/03/2026","BOOKING.COM HOTEL",17,1,334.62,0],["21/03/2026","MIAMIBCH PARKING METER",17,1,2.12,0],["21/12/2025","MF RDB CM",16,1,268.6,0],["21/12/2025","FOXTON RDB CM",16,1,308.4,0],["22/03/2026","DECATHLON",16,1,411.65,0],["22/03/2026","MOSAICO KITCHEN+BAR",17,1,99.1,0],["22/03/2026","IFD*ALMANARA RESTAURAN",13,1,389.48,0],["22/03/2026","MOSAICO KITCHEN+BAR",17,1,3.47,0],["22/10/2025","MAPLE BEAR STORE",5,1,853.37,0],["22/11/2025","TOY BOY",12,1,115.22,0],["23/01/2026","00046  SH BARRA RIO JA",3,1,149.76,0],["23/02/2026","LUIZA BARCELOS LOJA ONL",16,1,122.71,0],["23/03/2026","STARBUCKS STORE 73041",17,1,0.62,0],["23/03/2026","STARBUCKS STORE 73041",17,1,17.68,0],["23/03/2026","INDITEX BRASIL LTDA",16,1,232.5,0],["23/03/2026","HARD ROCK CONCESSIONS",17,1,5.5,0],["23/03/2026","UBR* PENDING.UBER.COM",17,1,4.31,0],["23/03/2026","HNT LOJA - A015 -",10,1,631.28,0],["23/03/2026","HARD ROCK STADIUM REST 61",17,1,5.5,0],["23/03/2026","RAIA2765",14,1,164.78,0],["23/03/2026","HARD ROCK CONCESSIONS",17,1,157.14,0],["23/03/2026","UBR* PENDING.UBER.COM",17,1,123.0,0],["23/03/2026","HARD ROCK STADIUM REST 61",17,1,157.14,0],["23/03/2026","NIKE.COM",17,1,28.29,0],["23/03/2026","NIKE.COM",17,1,808.36,0],["23/10/2025","LILIBEE     *LILIBEE",5,1,327.5,0],["23/12/2025","MP*MERCADOLIVRE",10,1,78.54,0],["24/02/2026","BERNARDO TEIXEIRA SAMP",4,1,269.66,0],["24/03/2026","CASADOPAODEQUEIJO",10,1,30.5,0],["24/03/2026","MOSAICO KITCHEN+BAR",17,1,1.48,0],["24/03/2026","MOSAICO KITCHEN+BAR",17,1,42.35,0],["24/03/2026","UBR* PENDING.UBER.COM",17,1,3.89,0],["24/03/2026","HOTEL INDIGO MIAMI BRI",17,1,0.78,0],["24/03/2026","UBR* PENDING.UBER.COM",17,1,4.08,0],["24/03/2026","HOTEL INDIGO MIAMI BRICK",17,1,8.75,0],["24/03/2026","UCHI MIAMI",17,1,46.22,0],["24/03/2026","HOTEL INDIGO MIAMI BRICK",17,1,250.11,0],["24/03/2026","HOTEL INDIGO MIAMI BRI",17,1,22.23,0],["24/03/2026","UBR* PENDING.UBER.COM",17,1,116.55,0],["24/03/2026","UBR* PENDING.UBER.COM",17,1,111.05,0],["24/03/2026","UCHI MIAMI",17,1,1320.58,0],["25/03/2026","HARD ROCK STADIUM REST 61",17,1,5.48,0],["25/03/2026","HARD ROCK STADIUM REST 61",17,1,14.45,0],["25/03/2026","HARD ROCK STADIUM REST 61",17,1,5.87,0],["25/03/2026","HARD ROCK STADIUM REST 61",17,1,167.69,0],["25/03/2026","HARD ROCK STADIUM REST 61",17,1,412.77,0],["25/03/2026","HARD ROCK STADIUM REST 61",17,1,156.54,0],["25/10/2025","AMAZONMKTPLC*CANELLASS",3,1,63.99,0],["25/11/2025","CLUB MED",17,1,898.8,0],["26/03/2026","SEPHORA BRICKELL CITY",16,1,6.02,0],["26/03/2026","ZARA USA 11810",17,1,14.49,0],["26/03/2026","H&M 0768/FLORIDA",17,1,5.95,0],["26/03/2026","SEPHORA BRICKELL CITY",16,1,171.92,0],["26/03/2026","ZARA USA 11810",17,1,413.88,0],["26/03/2026","H&M 0768/FLORIDA",17,1,169.98,0],["26/03/2026","TARGET T-2188",17,1,37.85,0],["26/03/2026","TARGET T-2188",17,1,1081.34,0],["27/01/2026","VINDI  *STARGARDENUNIF",1,1,196.8,0],["27/02/2026","BRINK CENTER",12,1,99.96,0],["27/03/2026","MIAMI AIRP EOS",17,1,114.32,0],["27/03/2026","UBR* PENDING.UBER.COM",17,1,9.89,0],["27/03/2026","749-DFA CHOCOLATE",17,1,14.12,0],["27/03/2026","PUBLIX #581",17,1,1.13,0],["27/03/2026","PUBLIX #1009",17,1,0.93,0],["27/03/2026","KU-VA",17,1,3.33,0],["27/03/2026","GILBERTS FOODBAR AT MIA",17,1,0.85,0],["27/03/2026","PUBLIX #581",17,1,32.32,0],["27/03/2026","749-DFA CHOCOLATE",17,1,403.38,0],["27/03/2026","NEWSCONNECTIONST2531",17,1,32.65,0],["27/03/2026","PUBLIX #581",17,1,193.26,0],["27/03/2026","PUBLIX #581",17,1,6.76,0],["27/03/2026","UBR* PENDING.UBER.COM",17,1,16.29,0],["27/03/2026","SQ *SHAKE SHACK",17,1,6.56,0],["27/03/2026","LS PELE SOCCER",17,1,16.61,0],["27/03/2026","NEWSCONNECTIONST2531",17,1,1.14,0],["27/03/2026","PUBLIX #1009",17,1,26.5,0],["27/03/2026","UBR* PENDING.UBER.COM",17,1,282.63,0],["27/03/2026","KU-VA",17,1,95.25,0],["27/03/2026","LS PELE SOCCER",17,1,474.57,0],["27/03/2026","GILBERTS FOODBAR AT MIA",17,1,24.28,0],["27/03/2026","SQ *SHAKE SHACK",17,1,187.5,0],["27/03/2026","UBR* PENDING.UBER.COM",17,1,465.53,0],["27/03/2026","MIAMI AIRP EOS",17,1,4.0,0],["27/10/2025","ORTOBOM",1,1,129.84,0],["28/03/2026","IFD*MJD BARRA DELIVERY",13,1,118.39,0],["28/03/2026","UBER * PENDING",17,1,188.04,0],["28/03/2026","CASADOPAODEQUEIJO",10,1,55.0,0],["28/03/2026","FREDDO",17,1,33.0,0],["29/03/2026","IFD*ABM PADARIA E CONFEIT",10,1,103.58,0],["29/03/2026","IFD*VIA PALATTO PADARI",13,1,80.69,0],["29/03/2026","IFD*ACADEMIA DA CACHAC",13,1,423.33,0],["29/03/2026","MP*DAVIDJOSEMART",3,1,60.0,0],["29/12/2025","ZARA BRASIL LTDA",16,1,201.6,0],["30/01/2026","INGRESSOCOM",9,1,65.91,0],["30/03/2026","BIBI SUCOS",13,1,72.9,0],["30/03/2026","HNT LOJA - A015 -",10,1,489.88,0],["31/01/2026","LUDIQUE ET BADIN",12,1,142.65,0],["31/01/2026","ADIDAS",12,1,124.99,0],["31/03/2026","LOJAS RIACHUELO",16,1,169.94,0],["31/03/2026","PG *PSP   KOPENHA",13,1,166.54,0],["31/03/2026","IFD*ABM PADARIA E CONFEIT",10,1,5.99,0],["31/03/2026","QUEIJ FINOS S MINAS",10,1,200.0,0],["31/03/2026","IFD*RCID COMERCIO DE ALIM",13,1,365.98,0],["01/05/2026","METRO RJ",15,1,15.8,3],["01/05/2026","CLAUDE.AI SUBSCRIPTION",0,1,3.85,3],["01/05/2026","CASA DO ALEMAO INDUSTR",13,1,98.23,3],["01/05/2026","POSTO DE GASOLINA BARR",15,1,325.0,3],["01/05/2026","RAIA2765",14,1,16.89,3],["01/05/2026","RAIA2765",14,1,54.37,3],["01/05/2026","CASA DO ALEMAO INDUSTR",13,1,40.8,3],["01/05/2026","CLAUDE.AI SUBSCRIPTION",0,1,110.0,3],["02/03/2026","NUTRISAUDE",14,1,120.58,3],["02/05/2026","POSTO RUA DA PRAIA",15,1,201.56,3],["02/05/2026","DVL MERCADO NORTE SUL",17,1,483.93,3],["03/03/2026","PG *111 STUDIO CO",4,1,124.84,3],["03/05/2026","IFD*LEVE MIRIN LTDA",13,1,409.95,3],["03/05/2026","IFD*TT BURGER ALIMENTO",13,1,150.47,3],["03/05/2026","IFD*ABM PADARIA E CONF",10,1,77.68,3],["04/01/2026","30109  RIO DESIGN BARR",3,1,107.98,3],["04/05/2026","JIM.COM* DANIELLE DE ALME",7,1,436.0,3],["04/05/2026","UBER * PENDING",17,1,18.98,3],["04/05/2026","DROGARIAS PACHECO",14,1,59.96,3],["04/05/2026","ASSAI ATACADISTA",10,1,1517.81,3],["04/05/2026","ZONA SUL FL 23",10,1,432.2,3],["04/05/2026","BANCA MERIDIAN",12,1,98.0,3],["04/05/2026","SHEIN  *JONATAS CARAMANO",16,1,70.99,3],["04/05/2026","JIM.COM DANIELLE DE ALMEI",7,1,425.0,3],["04/05/2026","QUEIJ FINOS S MINAS",10,1,200.0,3],["04/05/2026","COMPANHIA DO GARFO",13,1,31.65,3],["04/05/2026","ZARA BRASIL LTDA",16,1,99.68,3],["05/03/2026","INDITEX BRASIL LTDA",16,1,125.5,3],["05/05/2026","PG *WIX MAPLE BARRA",3,1,140.0,3],["05/05/2026","PEN PENISULA",13,1,28.5,3],["05/05/2026","PG *LEMME CICCLO ESPOR",4,1,253.8,3],["05/05/2026","FRANCISCO SABOR AMIGO",13,1,6.0,3],["05/05/2026","AMAZON BR",3,1,116.44,3],["06/04/2026","EBN*MCAFEE",0,1,83.0,3],["06/04/2026","AMAZON MARKETPLACE",3,1,84.25,3],["06/05/2026","UBER *TRIP HELP.UBER.COM",15,1,14.0,3],["06/05/2026","PG *PACOTES HYATT",12,1,198.0,3],["06/05/2026","UBER * PENDING",17,1,67.98,3],["06/05/2026","IFD*ISABELA AKKARI DOCES",13,1,65.98,3],["06/05/2026","ANTHROPIC",0,1,0.7,3],["06/05/2026","HNT LOJA - A015 -",10,1,68.34,3],["06/05/2026","ALMENDRA B E R LTDA",13,1,220.07,3],["06/05/2026","ANTHROPIC",0,1,20.0,3],["07/05/2026","MUDAVENDING",3,1,10.99,3],["07/05/2026","ABM PADARIA",10,1,11.0,3],["07/05/2026","PG *WIX MAPLE BARRA",3,1,140.0,3],["07/05/2026","DRY WASH AMERICAS DELIV",7,1,139.9,3],["07/05/2026","LOCUSSALAODE",14,1,63.0,3],["07/05/2026","YELUMSEG PARC5",2,1,350.01,3],["07/05/2026","LU RECH STUDIO",14,1,70.0,3],["07/05/2026","ESPACO CAJU",13,1,245.0,3],["08/05/2026","DOIS VALES RESTAURANTE",13,1,595.28,3],["08/05/2026","PAVELKA",13,1,100.31,3],["08/05/2026","62857350EMANOELLE",14,1,70.0,3],["08/05/2026","POSTO DE GASOLINA BARR",15,1,215.64,3],["08/05/2026","SEPHORA BARRA",16,1,63.0,3],["08/05/2026","POUSADA CANTAGALO",17,1,450.0,3],["08/05/2026","IFD*DP1 RESTAURANTE LTDA",13,1,30.92,3],["09/03/2026","BEEP SAUDE",14,1,110.51,3],["09/05/2026","AMAZON PRIME CANAIS",0,1,34.9,3],["10/01/2026","ZARA BRASIL LTDA",16,1,203.2,3],["10/04/2026","AMAZONMKTPLC*VIVAMARSU",3,1,93.7,3],["10/04/2026","AMAZONMKTPLC*PRATITOLT",3,1,29.45,3],["10/05/2026","PG *PACOTES HYATT RJ",12,1,396.0,3],["10/05/2026","ZONA SUL FL 23",10,1,424.05,3],["10/05/2026","YELUMSEG PARC4",2,1,58.81,3],["10/05/2026","MP*LOTERIASONLINE741L",9,1,30.0,3],["10/05/2026","IFD*LEVE MIRIN LTDA",13,1,175.48,3],["10/12/2025","BPG IGUATEMI*IGUA",3,1,103.07,3],["11/03/2026","TUDIN LIMPIN",19,1,206.65,3],["11/05/2026","UBER * PENDING",17,1,19.95,3],["11/05/2026","UBER * PENDING",17,1,26.94,3],["11/05/2026","HNT LOJA - A015 -",10,1,232.86,3],["11/05/2026","PRIME PARKING",15,1,31.0,3],["11/05/2026","MEGA ARABE",13,1,10.0,3],["11/05/2026","MILLESIME COMERCIO DE",18,1,369.5,3],["11/05/2026","RGE COMERCIO DE A",4,1,94.38,3],["12/04/2026","ZONA SUL FL 23",10,1,333.33,3],["12/05/2026","ZONA SUL DELIV",10,1,72.83,3],["12/05/2026","EBN    *CANVA04879 29",0,1,35.0,3],["12/05/2026","IFD*MJD BARRA DELIVERY",13,1,111.89,3],["13/01/2026","AMAZON MARKETPLACE",3,1,47.18,3],["13/03/2026","MLP*NETSHOES NETS",3,1,99.99,3],["13/03/2026","FOXTON BARRA SHOP CM",16,1,113.13,3],["13/04/2026","IGUASPO*IGUASPORT LTDA",9,1,103.45,3],["13/05/2026","CERVANTES",13,1,113.4,3],["13/05/2026","ABM PADARIA",10,1,25.0,3],["13/05/2026","TVN NATURAL PRIME COMER",10,1,73.5,3],["13/05/2026","MP*LOTERIASONLINEUMHL",9,1,36.0,3],["14/05/2026","HNT LOJA - A015 -",10,1,451.5,3],["14/05/2026","NEW LIFE LANCHES LTDA",13,1,67.05,3],["15/04/2026","DM*SPOTIFY",0,1,40.9,3],["15/05/2026","MARCUS ANDRE SOAR",11,1,190.0,3],["15/05/2026","ZONA SUL DELIV",10,1,129.97,3],["15/05/2026","DM*SPOTIFY",0,1,40.9,3],["16/04/2026","METRO RJ",15,1,7.9,3],["16/04/2026","HNT LOJA - A029 -",10,1,418.12,3],["16/05/2026","HORTIFRUTI",10,1,12.0,3],["16/05/2026","TVN NATURAL PRIME COMER",10,1,81.0,3],["16/05/2026","IFD*ALMANARA RESTAURAN",13,1,216.38,3],["17/04/2026","CASTELINHO DO UNIFOR",12,1,9.9,3],["17/04/2026","CASTELINHO DO UNIFOR",12,1,49.9,3],["17/04/2026","TVN NATURAL PRIME COMER",10,1,43.0,3],["17/04/2026","BARBUDUS",14,1,70.0,3],["17/04/2026","IFD*MJD BARRA DELIVERY",13,1,97.9,3],["17/04/2026","ZONA SUL FL 23",10,1,350.73,3],["17/04/2026","ESPACO CAJU",13,1,60.0,3],["17/04/2026","IFD*DP1 RESTAURANTE LT",13,1,33.89,3],["17/05/2026","IFD*MJD BARRA DELIVERY",13,1,115.89,3],["17/05/2026","NAGA ALIMENTOS",13,1,724.33,3],["17/05/2026","IFD*VIA PALATTO PADARIA E",13,1,24.67,3],["17/05/2026","FRANCISCO SABOR AMIGO",13,1,10.0,3],["18/03/2026","ZARA BRASIL LTDA",16,1,331.0,3],["18/03/2026","ZARA BRASIL LTDA",16,1,166.0,3],["18/04/2026","FORT FARMA",14,1,9.99,3],["18/04/2026","NETFLIX.COM",0,1,59.9,3],["18/04/2026","MP*LOTERIASONLINEDRB8",9,1,216.0,3],["18/04/2026","IFD*ISABELA AKKARI DOCES",13,1,127.99,3],["18/04/2026","CASA DO ALEMAO INDUSTR",13,1,35.8,3],["18/04/2026","METRO RJ",15,1,7.9,3],["19/02/2026","INDITEX BRASIL LTDA",16,1,165.2,3],["19/03/2026","ASSIST CARD DO BRASIL",17,1,77.76,3],["19/03/2026","ASSIST CARD DO BRASIL",17,1,103.67,3],["19/04/2026","MP*BRINQUEDOS",12,1,10.0,3],["19/04/2026","MP*BRINQUEDOS",12,1,160.0,3],["20/03/2026","EC*TICKETMASTER",17,1,625.96,3],["20/04/2026","LIVRARIA DA *TRAV",12,1,59.95,3],["21/01/2026","RENNER",16,1,165.74,3],["21/02/2026","FILA BR N AMERICA",16,1,56.66,3],["21/04/2026","POSTO PORTAL DAS DUNAS",15,1,220.22,3],["21/04/2026","CASA DO ALEMAO INDUSTR",13,1,34.8,3],["21/04/2026","CASA DO ALEMAO INDUSTR",13,1,115.28,3],["21/04/2026","IFD*CITTA DELIRIO REST",13,1,219.99,3],["21/12/2025","MF RDB CM",16,1,268.6,3],["21/12/2025","FOXTON RDB CM",16,1,308.4,3],["22/03/2026","DECATHLON",16,1,411.64,3],["22/04/2026","CENTRO DE DERMATO",14,1,1150.0,3],["22/04/2026","RAIA2765",14,1,75.02,3],["22/04/2026","RAIA2765",14,1,19.94,3],["22/10/2025","MAPLE BEAR STORE",5,1,853.37,3],["23/02/2026","LUIZA BARCELOS LOJA ONL",16,1,122.71,3],["23/03/2026","INDITEX BRASIL LTDA",16,1,232.5,3],["23/04/2026","ANTHROPIC",0,1,50.0,3],["23/04/2026","ANTHROPIC",0,1,46.79,3],["23/04/2026","IFD*LOUCO DELIVERY COM",13,1,45.74,3],["23/04/2026","ANTHROPIC",0,1,1.75,3],["23/04/2026","IFD*LOUCO DELIVERY COM",13,1,123.68,3],["23/04/2026","ANTHROPIC",0,1,1.64,3],["23/04/2026","NEW LIFE LANCHES LTDA",13,1,94.3,3],["23/04/2026","METRO RJ",15,1,7.9,3],["23/10/2025","LILIBEE     *LILIBEE",5,1,327.5,3],["23/12/2025","MP*MERCADOLIVRE",10,1,78.54,3],["24/02/2026","BERNARDO TEIXEIRA SAMP",4,1,269.66,3],["24/04/2026","IFD*DP1 RESTAURANTE LT",13,1,33.89,3],["24/04/2026","CABANA LANCHES",13,1,115.03,3],["24/04/2026","BACIODILATTE-LJ0109",13,1,66.8,3],["24/04/2026","BACIODILATTE-LJ0109",13,1,11.0,3],["24/04/2026","BACIODILATTE-LJ0109",13,1,16.95,3],["24/04/2026","ANTHROPIC",0,1,1.75,3],["24/04/2026","IFD*LOUCO DELIVERY COM",13,1,63.88,3],["24/04/2026","BOMBONIERE CHOCOLEME E",13,1,47.6,3],["24/04/2026","GB BARRA SQUARE",6,1,314.1,3],["24/04/2026","ANTHROPIC",0,1,50.0,3],["25/04/2026","MUDAVENDING",3,1,15.98,3],["25/04/2026","IFD*VIA PALATTO PADARI",13,1,46.32,3],["25/04/2026","MUDAVENDING",3,1,5.99,3],["25/04/2026","IFD*TT BURGER ALIMENTO",13,1,106.79,3],["25/04/2026","HNT LOJA - A015 -",10,1,343.33,3],["25/04/2026","TVN NATURAL PRIME COMER",10,1,65.5,3],["25/04/2026","MP*LOTERIASONLINEKYL7",9,1,216.0,3],["25/04/2026","HNT LOJA - A015 -",10,1,37.9,3],["25/04/2026","NUTRISAUDE",14,1,105.99,3],["25/04/2026","FOXTON BARRA SHOP CM",16,1,113.52,3],["25/10/2025","AMAZONMKTPLC*CANELLASS",3,1,63.99,3],["25/11/2025","CLUB MED",17,1,898.8,3],["26/04/2026","IFD*IFOOD",0,1,2.0,3],["26/04/2026","DROGARIA VENANCIO",14,1,67.99,3],["26/04/2026","IFD*VIA PALATTO PADARI",13,1,26.82,3],["26/04/2026","MP*POINTDM",9,1,50.0,3],["26/04/2026","PG *WIX MAPLE BARRA",3,1,90.0,3],["26/04/2026","DENGOCHOCOLATESSA",13,1,21.8,3],["26/04/2026","ROYAL GRILL",13,1,404.14,3],["26/04/2026","BACIO DI LATTE-LJ3025",13,1,99.8,3],["26/04/2026","IFD*FERRO BARRA PIZZAR",13,1,95.99,3],["27/02/2026","BRINK CENTER",12,1,99.96,3],["27/04/2026","BANKA KIDS",16,1,58.3,3],["27/04/2026","DECATHLON",16,1,58.23,3],["27/04/2026","RAIA2765",14,1,315.16,3],["27/04/2026","DROGARIA LIDER COPA",14,1,35.82,3],["27/04/2026","ZEBOTAO FREEWAY",16,1,27.6,3],["27/04/2026","GOLDEN GREEN MANI",14,1,66.59,3],["27/04/2026","PG *WIX MAPLE BARRA",3,1,90.0,3],["27/04/2026","HNT LOJA - A014 -",10,1,39.23,3],["27/04/2026","ANTHROPIC",0,1,0.7,3],["27/04/2026","SAPATEIRO FREEWAY",16,1,198.0,3],["27/04/2026","ANTHROPIC",0,1,20.0,3],["27/04/2026","ESTOK DISTRIBUID",19,1,167.6,3],["28/04/2026","PDV*CITY LAR",19,1,55.8,3],["28/04/2026","BARBUDUS",14,1,70.0,3],["28/04/2026","TVN NATURAL PRIME COMER",10,1,26.5,3],["28/04/2026","PORTO DO SABOR",13,1,12.9,3],["28/04/2026","MP*LOTERIASONLINEHPDN",9,1,246.0,3],["28/04/2026","ZARA HOME BRAZIL",16,1,319.9,3],["28/04/2026","TOY BOY",12,1,40.26,3],["29/04/2026","HNT LOJA - A015 -",10,1,215.15,3],["29/04/2026","METRO RJ",15,1,7.9,3],["29/04/2026","MP*LOTERIASONLINE8FNG",9,1,66.0,3],["29/04/2026","MP*LOTERIASONLINETK1F",9,1,90.0,3],["29/12/2025","ZARA BRASIL LTDA",16,1,201.6,3],["30/04/2026","UBER * PENDING",17,1,13.98,3],["30/04/2026","ANTHROPIC",0,1,1.75,3],["30/04/2026","IFD*CLARK PATISSERIE C",13,1,122.89,3],["30/04/2026","METRO RJ",15,1,7.9,3],["30/04/2026","RESTAURANTE ALFAIA",13,1,280.0,3],["30/04/2026","IFD*MJD BARRA DELIVERY",13,1,408.86,3],["30/04/2026","ANTHROPIC",0,1,50.0,3],["31/01/2026","ADIDAS",12,1,124.99,3],["31/03/2026","LOJAS RIACHUELO",16,1,169.94,3],["31/03/2026","PG *PSP   KOPENHA",13,1,166.53,3],["2026-05-16","AmazonPrimeBR",0,0,19.9,3],["2026-05-15","RAPPI  *AMERICANAS S A",3,0,47.1,3],["2026-05-14","FUTEBOLCARD",9,0,770.0,3],["2026-05-13","APPLE.COM/BILL",0,0,99.9,3],["2026-05-13","AMAZON BR",3,0,25.1,3],["2026-05-13","RAPPI  *RI HAPPY BRINQ",12,0,97.76,3],["2026-05-10","RAPPI  *AMERICANAS S A",3,0,91.79,3],["2026-05-07","IOF COMPRA INTERNACIONA",8,0,2.71,3],["2026-05-06","APPLE.COM/BILL",0,0,29.9,3],["2026-05-06","AMAZON PRIME*209PD2233",0,0,78.1,3],["2026-05-06","Google One",0,0,9.99,3],["2026-05-06","AMAZON BR         01/02",3,0,92.45,3],["2026-05-06","RAPPI*CSB DROGARIAS S",14,0,63.99,3],["2026-05-05","DL          *UberRides",15,0,31.14,3],["2026-05-05","RAPPI*DROGARIAS PACHEC",14,0,99.09,3],["2026-05-04","Disney Plus",0,0,44.5,3],["2026-05-04","AMAZON BR",3,0,49.8,3],["2026-05-04","AMAZON MARKETPLACE01/03",3,0,97.25,3],["2026-05-03","IFD*IFOOD CLUB",0,0,12.9,3],["2026-04-30","APPLE.COM/BILL.",0,0,99.9,3],["2026-04-30","RAPPI  *AMERICANAS S A",3,0,76.93,3],["2026-04-29","RAPPI*Rappi Brasil Int",13,0,24.9,3],["2026-04-28","SEM PARAR",6,0,287.42,3],["2026-04-28","Google One",0,0,14.99,3],["2026-04-27","PICPAY*MundialJardim",10,0,1203.59,3],["2026-04-27","MERCADOLIVRE*LOJADOPR",3,0,33.49,3],["2026-04-27","RAPPI*CSB DROGARIAS S",14,0,143.33,3],["2026-04-21","RAPPI*AMERICANAS S A",3,0,246.75,3],["2026-04-21","RAPPI  *AMERICANAS S A",3,0,10.15,3],["2026-04-21","RAPPI  *AMERICANAS S A",3,0,6.08,3],["2026-04-21","RAPPI  *SUPER MERCADO",10,0,71.57,3],["2026-04-20","APPLE.COM/BILL.",0,0,66.9,3],["2026-04-18","APPLE.COM/BILL.",0,0,66.9,3],["2026-04-18","APPLE.COM/BILL.",0,0,29.9,3],["2026-04-15","AMAZON MARKETPLACE02/02",3,0,187.99,3],["2026-04-15","AMAZON BR         02/05",3,0,65.13,3],["2026-04-08","AMAZON MARKETPLACE02/02",3,0,171.1,3],["2026-03-30","AMAZON BR         02/02",3,0,105.1,3],["2026-02-23","AMAZONMKTPLC*NATAL03/03",3,0,281.49,3],["2026-01-29","TUDIN LIMPIN      04/06",19,0,123.35,3],["2026-01-14","TUDIN LIMPIN      05/06",19,0,118.35,3],["2025-12-01","AMAZONMKTPLC*PRAIA06/08",3,0,83.08,3],["2025-09-24","asicsbr-2648804   08/08",16,0,50.16,3],["2025-08-12","AMAZONMKTPLC*CANEL10/10",3,0,112.73,3],["2025-07-22","AMAZON MARKETPLACE10/10",3,0,7.39,3],["2025-07-22","AMAZONMKTPLC*HOMEC10/10",3,0,23.8,3],["2025-07-22","AMAZONMKTPLC*DISTR10/10",3,0,30.4,3],["2025-07-22","AMAZONMKTPLC*ZIDIN10/10",3,0,6.98,3]];
-const DEFAULT_TX = TX_RAW.map(r=>({data:r[0],estab:r[1],cat:TX_META.cats[r[2]],cartao:TX_META.cartoes[r[3]],valor:r[4],mes:TX_META.meses[r[5]]}));
-
-
-// ── INIT ────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  loadData();
-  applyStoredEdits();
-  document.getElementById('nav-dt').textContent='Atualizado em '+D.atualizado;
-  document.getElementById('ft-dt').textContent=D.atualizado;
-  buildOverview();
-  buildMensal();
-  buildCategorias();
-  buildLancamentos();
-    buildAtualizar();
 });
 </script>
 </body>
