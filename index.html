@@ -228,7 +228,8 @@ function buildOverview() {
   const tC = m.reduce((s,x)=>s+parseFloat(x.cart_total||0),0);
   const tF = m.reduce((s,x)=>s+parseFloat(x.fixos_total||0),0);
   const tV = m.reduce((s,x)=>s+parseFloat(x.viagens_total||0),0);
-  const tD = tC+tV+tF;
+  const tFe = m.reduce((s,x)=>s+parseFloat(x.festa_total||0),0);
+  const tD = tC+tV+tF+tFe;
   const tS = m.reduce((s,x)=>s+parseFloat(x.saldo||0),0);
 
   let h = `<div class="sh" style="margin-top:1rem"><div class="st">Consolidado 2026</div><div class="ss">${m.map(x=>x.mes).join(' · ')}</div></div>`;
@@ -256,8 +257,9 @@ function buildOverview() {
     ['— Cartão Itaú',...m.map(x=>+x.cart_itau),m.reduce((s,x)=>s+(+x.cart_itau),0)],
     ['— Cartão XP',...m.map(x=>+x.cart_xp),m.reduce((s,x)=>s+(+x.cart_xp),0)],
     ['Viagens',...m.map(x=>+x.viagens_total),tV],
+    ['Festas dos Filhos',...m.map(x=>+(x.festa_total||0)),tFe],
     ['Fixos & Serviços',...m.map(x=>+x.fixos_total),tF],
-    ['Despesas totais',...m.map(x=>(+x.cart_total)+(+x.viagens_total)+(+x.fixos_total)),tD],
+    ['Despesas totais',...m.map(x=>(+x.cart_total)+(+x.viagens_total)+(+x.fixos_total)+(+(x.festa_total||0))),tD],
     ['SALDO',...m.map(x=>+x.saldo),tS],
   ];
   linhas.forEach(([nome,...vals])=>{
@@ -287,7 +289,7 @@ function buildOverview() {
 
   new Chart(document.getElementById('c1'),{type:'bar',data:{labels:m.map(x=>x.mes),datasets:[
     {label:'Receitas',data:m.map(x=>+x.rec_total),backgroundColor:'#1A5C3A',borderRadius:5},
-    {label:'Despesas',data:m.map(x=>(+x.cart_total)+(+x.viagens_total)+(+x.fixos_total)),backgroundColor:'#C8973A',borderRadius:5}
+    {label:'Despesas',data:m.map(x=>(+x.cart_total)+(+x.viagens_total)+(+x.fixos_total)+(+(x.festa_total||0))),backgroundColor:'#C8973A',borderRadius:5}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
 
   new Chart(document.getElementById('c2'),{type:'bar',data:{labels:m.map(x=>x.mes),datasets:[{data:m.map(x=>+x.saldo),backgroundColor:m.map(x=>(+x.saldo)>=0?'rgba(26,92,58,.8)':'rgba(139,26,26,.8)'),borderRadius:5}]},
@@ -313,7 +315,8 @@ function renderMesTotal(){
   const tF=MESES.reduce((s,m)=>s+parseFloat(m.fixos_total||0),0);
   const tV=MESES.reduce((s,m)=>s+parseFloat(m.viagens_total||0),0);
   const tS=MESES.reduce((s,m)=>s+parseFloat(m.saldo||0),0);
-  const tot=tC+tV+tF;
+  const tFe2=MESES.reduce((s,m)=>s+parseFloat(m.festa_total||0),0);
+  const tot=tC+tV+tF+tFe2;
   const fmap={};
   FIXOS.forEach(f=>{if(+f.valor>0){if(!fmap[f.nome])fmap[f.nome]=0;fmap[f.nome]+=+f.valor;}});
   const fixSorted=Object.entries(fmap).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
@@ -337,6 +340,7 @@ function renderMesTotal(){
     <table style="margin-bottom:8px">
       <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(tC)}</td></tr>
       <tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(tV)}</td></tr>
+      ${tFe2>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(tFe2)}</td></tr>`:''}
       <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(tF)}</td></tr>
       <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
       <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
@@ -363,7 +367,7 @@ function renderMes(i){
   if(!m)return;
   const viaM = VIAGENS.filter(v=>v.mes===m.mes);
   const fixM = FIXOS.filter(f=>f.mes===m.mes&&+f.valor>0).sort((a,b)=>+b.valor-+a.valor);
-  const tot=(+m.cart_total)+(+m.viagens_total)+(+m.fixos_total);
+  const tot=(+m.cart_total)+(+m.viagens_total)+(+m.fixos_total)+(+(m.festa_total||0));
   let h=`<div class="g2">
     <div class="cd"><div class="ct">Receitas & Cartões — ${m.mes}</div><table>
       <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
@@ -382,6 +386,7 @@ function renderMes(i){
     <table style="margin-bottom:8px">
       <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(+m.cart_total)}</td></tr>
       ${viaM.length?`<tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(+m.viagens_total)}</td></tr>`:''}
+      ${+(m.festa_total||0)>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(+(m.festa_total||0))}</td></tr>`:''}
       <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(+m.fixos_total)}</td></tr>
       <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
       <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
