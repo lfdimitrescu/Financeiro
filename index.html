@@ -456,7 +456,7 @@ function buildTransferencias() {
     <input type="text" class="search-input" id="transf-q" placeholder="Buscar..." oninput="renderTransf()">
   </div>`;
   h+=`<div class="cd" style="max-height:550px;overflow-y:auto"><table><thead style="position:sticky;top:0;background:var(--s)">
-    <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Portador</th><th style="text-align:right">Valor</th></tr>
+    <tr><th>Data</th><th>Descrição</th><th>Conta</th><th>Quem pagou</th><th>Categoria</th><th style="text-align:right">Valor</th></tr>
   </thead><tbody id="transf-tb"></tbody></table></div>`;
   document.getElementById('pg-transferencias').innerHTML=h;
   renderTransf();
@@ -475,8 +475,9 @@ function renderTransf() {
     return `<tr style="background:${bg}">
       <td style="font-size:11px;white-space:nowrap">${t.data}</td>
       <td style="font-size:11px">${t.estabelecimento}</td>
-      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\\'")}',this)" title="Clique para alterar">${t.categoria} ✎</span></td>
+      <td style="font-size:11px">${t.cartao||'—'}</td>
       <td style="font-size:11px">${t.portador||'—'}</td>
+      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\\'")}',this)" title="Clique para alterar">${t.categoria} ✎</span></td>
       <td class="num" style="font-size:11px;font-weight:500">${fmt(parseFloat(t.valor))}</td>
     </tr>`;
   }).join('');
