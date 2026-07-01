@@ -485,7 +485,7 @@ function renderTransf() {
 
 // ── LANÇAMENTOS ───────────────────────────────────────────────
 function buildLancamentos() {
-  const TXC = TX.filter(t=>t.tipo!=='pix');
+  const TXC = TX.filter(t=>t.tipo==='cartao');
   const mesesNomes=['Todos',...new Set(TXC.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
   const cats=['Todas',...new Set(TXC.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
 
@@ -504,7 +504,7 @@ function buildLancamentos() {
 
 function renderTx() {
   const q=(document.getElementById('tx-q')?.value||'').toLowerCase();
-  let f=TX.filter(t=>t.tipo!=='pix');
+  let f=TX.filter(t=>t.tipo==='cartao');
   if(txMesF!=='Todos')f=f.filter(t=>t.mes===txMesF);
   if(txCatF!=='Todas')f=f.filter(t=>t.categoria===txCatF);
   if(q)f=f.filter(t=>t.estabelecimento.toLowerCase().includes(q));
