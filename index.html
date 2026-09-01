@@ -176,19 +176,34 @@ function mostrarErro(msg) {
 
 // ── CARREGAR DADOS ────────────────────────────────────────────
 async function carregarDados() {
-  const [r1, r2, r3, r4] = await Promise.all([
+  // Paginate transacoes to get ALL records past server 2000-row limit
+  async function fetchAll(table, opts={}) {
+    const pageSize = 1000;
+    let all = [], from = 0;
+    while (true) {
+      let q = sb.from(table).select('*').range(from, from + pageSize - 1);
+      if (opts.order) opts.order.forEach(([col, asc]) => { q = q.order(col, {ascending: asc !== false}); });
+      const { data, error } = await q;
+      if (error || !data || data.length === 0) break;
+      all = all.concat(data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    return all;
+  }
+
+  const [r1, txData, fixosData, viagData] = await Promise.all([
     sb.from('meses').select('*').order('ano'),
-    sb.from('transacoes').select('*').order('mes').order('valor', {ascending: false}).limit(5000),
-    sb.from('fixos').select('*').order('mes').order('valor', {ascending: false}),
-    sb.from('viagens').select('*').order('mes'),
+    fetchAll('transacoes'),
+    fetchAll('fixos'),
+    fetchAll('viagens'),
   ]);
   const ordemMeses = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const normMes = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
   MESES = (r1.data || []).map(m=>({...m,mes:normMes(m.mes)})).sort((a,b) => ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes));
-  const normMesTX = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
-  TX = (r2.data || []).map(t => ({...t, mes: normMesTX(t.mes)}));
-  FIXOS = (r3.data || []).map(f=>({...f,mes:f.mes.normalize('NFC').replace('Março','Marco').replace(/^Mar.o$/i,'Marco')}));
-  VIAGENS = (r4.data || []).map(v=>({...v,mes:v.mes.normalize('NFC').replace('Março','Marco').replace(/^Mar.o$/i,'Marco')}));
+  TX = txData.map(t => ({...t, mes: normMes(t.mes)}));
+  FIXOS = fixosData.map(f=>({...f,mes:normMes(f.mes)}));
+  VIAGENS = viagData.map(v=>({...v,mes:normMes(v.mes)}));
 }
 
 // ── INICIALIZAR ───────────────────────────────────────────────
@@ -431,37 +446,39 @@ function buildCategorias() {
   cats.forEach(([n,v],i)=>{
     h+=`<div class="br-row"><span class="br-l" style="min-width:150px;font-size:11px">${n}</span><div class="br-t"><div class="br-f" style="width:${(v.total/mx*100).toFixed(1)}%;background:${cores[i%cores.length]}"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v.total)}</span></div>`;
   });
-  h+=`</div><div class="cd" style="grid-column:1/-1"><div class="ct">Tabela comparativa <span style="color:var(--t3);font-weight:400;font-size:10px">(valores em R$, sem centavos)</span></div>
-  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-  <table style="min-width:700px;border-collapse:collapse;width:100%">
+  h+=`</div></div>`;
+  // Tabela comparativa full-width
+  h+=`<div class="cd" style="margin-top:14px"><div class="ct">Tabela comparativa <span style="color:var(--t3);font-weight:400">(R$ arredondado)</span></div>
+  <div style="overflow-x:auto">
+  <table style="border-collapse:collapse;width:100%;white-space:nowrap">
     <thead><tr style="border-bottom:2px solid var(--bd)">
-      <th style="text-align:left;padding:8px 12px 8px 0;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;min-width:140px;position:sticky;left:0;background:var(--s)">Categoria</th>
-      ${mesesNomes.map(mn=>`<th style="text-align:right;padding:8px 6px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;min-width:58px">${mn.slice(0,3)}</th>`).join('')}
-      <th style="text-align:right;padding:8px 6px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;min-width:68px;border-left:1px solid var(--bd)">Total</th>
-      <th style="text-align:right;padding:8px 0 8px 6px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;min-width:62px">Média</th>
+      <th style="text-align:left;padding:8px 16px 8px 0;font-size:10px;color:var(--t3);letter-spacing:.06em;min-width:150px">CATEGORIA</th>
+      ${mesesNomes.map(mn=>`<th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--t3);letter-spacing:.06em">${mn.slice(0,3).toUpperCase()}</th>`).join('')}
+      <th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--t);letter-spacing:.06em;border-left:2px solid var(--bd)">TOTAL</th>
+      <th style="text-align:right;padding:8px 0 8px 10px;font-size:10px;color:var(--t3);letter-spacing:.06em">MÉDIA</th>
     </tr></thead>
     <tbody>`;
-  const fN = v => v===0 ? '<span style="color:var(--bd)">—</span>' : Math.round(v).toLocaleString('pt-BR');
+  const fN = v => v===0 ? '<span style="color:#ddd">—</span>' : Math.round(v).toLocaleString('pt-BR');
   cats.forEach(([n,v],i)=>{
     const media = v.total / mesesNomes.length;
     const bg = i%2===0?'var(--s2)':'var(--s)';
-    h+=`<tr style="background:${bg}">
-      <td style="padding:7px 12px 7px 0;font-size:11px;font-weight:500;position:sticky;left:0;background:${bg};white-space:nowrap">${n}</td>
-      ${mesesNomes.map(mn=>`<td style="text-align:right;padding:7px 6px;font-size:11px;color:${(v[mn]||0)===0?'var(--t3)':'var(--t)'}">${fN(v[mn]||0)}</td>`).join('')}
-      <td style="text-align:right;padding:7px 6px;font-size:11px;font-weight:600;border-left:1px solid var(--bd)">${fN(v.total)}</td>
-      <td style="text-align:right;padding:7px 0 7px 6px;font-size:11px;color:var(--t2)">${fN(media)}</td>
+    h+=`<tr style="background:${bg};border-bottom:1px solid var(--bd)">
+      <td style="padding:8px 16px 8px 0;font-size:12px;font-weight:500">${n}</td>
+      ${mesesNomes.map(mn=>`<td style="text-align:right;padding:8px 10px;font-size:12px;color:${(v[mn]||0)===0?'#ccc':'var(--t)'}">${fN(v[mn]||0)}</td>`).join('')}
+      <td style="text-align:right;padding:8px 10px;font-size:12px;font-weight:700;border-left:2px solid var(--bd)">${fN(v.total)}</td>
+      <td style="text-align:right;padding:8px 0 8px 10px;font-size:12px;color:var(--t2)">${fN(media)}</td>
     </tr>`;
   });
   const totRow=mesesNomes.map(mn=>cats.reduce((s,[,v])=>s+(v[mn]||0),0));
   const grandTotal=cats.reduce((s,[,v])=>s+v.total,0);
   const grandMedia=grandTotal/mesesNomes.length;
-  h+=`<tr style="border-top:2px solid var(--bd);font-weight:600">
-    <td style="padding:9px 12px 9px 0;font-size:11px;position:sticky;left:0;background:var(--s)">TOTAL</td>
-    ${totRow.map(v=>`<td style="text-align:right;padding:9px 6px;font-size:11px">${fN(v)}</td>`).join('')}
-    <td style="text-align:right;padding:9px 6px;font-size:11px;border-left:1px solid var(--bd)">${fN(grandTotal)}</td>
-    <td style="text-align:right;padding:9px 0 9px 6px;font-size:11px;color:var(--t2)">${fN(grandMedia)}</td>
+  h+=`<tr style="border-top:2px solid var(--t);font-weight:700;background:var(--s)">
+    <td style="padding:10px 16px 10px 0;font-size:12px">TOTAL</td>
+    ${totRow.map(v=>`<td style="text-align:right;padding:10px;font-size:12px">${fN(v)}</td>`).join('')}
+    <td style="text-align:right;padding:10px;font-size:12px;border-left:2px solid var(--bd)">${fN(grandTotal)}</td>
+    <td style="text-align:right;padding:10px 0 10px 10px;font-size:12px;color:var(--t2)">${fN(grandMedia)}</td>
   </tr>`;
-  h+=`</tbody></table></div></div></div>`;
+  h+=`</tbody></table></div></div>`;
   document.getElementById('pg-categorias').innerHTML=h;
 
   const top6=cats.slice(0,6);
