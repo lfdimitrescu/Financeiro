@@ -431,27 +431,35 @@ function buildCategorias() {
   const mesesNomes = MESES.map(m=>m.mes);
   const catMap = {};
 
-  // 1. Transações (cartão + pix + débito) — todos os meses
-  TX.forEach(t=>{
-    if(+t.valor<=0) return;
-    if(!catMap[t.categoria]) catMap[t.categoria]={total:0};
-    if(!catMap[t.categoria][t.mes]) catMap[t.categoria][t.mes]=0;
-    catMap[t.categoria][t.mes]+=parseFloat(t.valor);
-    catMap[t.categoria].total+=parseFloat(t.valor);
+  function addCat(cat, mes, val) {
+    if(+val<=0) return;
+    if(!catMap[cat]) catMap[cat]={total:0};
+    if(!catMap[cat][mes]) catMap[cat][mes]=0;
+    catMap[cat][mes]+=parseFloat(val);
+    catMap[cat].total+=parseFloat(val);
+  }
+
+  // 1. Cartão (todos os meses) — gastos variáveis no cartão
+  TX.filter(t=>t.tipo==='cartao').forEach(t=>addCat(t.categoria, t.mes, t.valor));
+
+  // 2. FIXOS (todos os meses) — custos fixos recorrentes
+  // São a fonte primária para: escola, babá, luz, gás, condomínio, etc.
+  const FIXOS_CATS = new Set();
+  FIXOS.forEach(f=>{
+    addCat(f.nome, f.mes, f.valor);
+    FIXOS_CATS.add(f.nome);
   });
 
-  // 2. Fixos para meses sem rastreamento individual (Jan-Abr)
-  // Nesses meses os custos fixos ficaram só em fixos, não em transacoes
-  const mesesSemPix = new Set(['Janeiro','Fevereiro','Marco','Abril']);
-  FIXOS.forEach(f=>{
-    if(!mesesSemPix.has(f.mes)) return; // Maio-Ago já têm em TX como debito/pix
-    if(+f.valor<=0) return;
-    const cat = f.nome;
-    if(!catMap[cat]) catMap[cat]={total:0};
-    if(!catMap[cat][f.mes]) catMap[cat][f.mes]=0;
-    catMap[cat][f.mes]+=parseFloat(f.valor);
-    catMap[cat].total+=parseFloat(f.valor);
-  });
+  // 3. PIX variáveis (apenas categorias NÃO cobertas pelos FIXOS)
+  // Evita dupla contagem: babá já está em FIXOS como 'Babá (Carolin)'
+  const PIX_SKIP = new Set([
+    'Funcionários/Serviços','Escola dos Filhos','Condomínio',
+    'Financiamento Imobiliário','Energia - Light','Internet/Tel - Vivo',
+    'Gás - CEG','IPTU (BKI RIO)','Impostos & Taxas','Despesas PJ (Andressa)',
+    'Babá (Carolin)','Babá (Carol)','Tarifa Bancária Bradesco','Outros PIX enviados',
+    'Carro','Educação & Trabalho'
+  ]);
+  TX.filter(t=>t.tipo==='pix' && !PIX_SKIP.has(t.categoria)).forEach(t=>addCat(t.categoria, t.mes, t.valor));
   const cats=Object.entries(catMap).filter(([,v])=>v.total>0).sort((a,b)=>b[1].total-a[1].total);
   const mx=cats[0]?.[1].total||1;
   const cores=['#1A5C3A','#2D7A4F','#C8973A','#D4A84E','#0D3B6E','#1A5C8A','#8B1A1A','#A03333','#4A7C59','#6BBF8E','#7A4E0D','#9B6A2A','#2A4A7A','#5A7A3A','#7A2A5A'];
