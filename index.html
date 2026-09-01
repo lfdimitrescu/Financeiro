@@ -249,7 +249,7 @@ function buildOverview() {
 
   // Comparativo
   h += `<div class="sh"><div class="st">Resumo comparativo</div></div><div class="cd"><table>`;
-  h += `<tr><th>Item</th>${m.map(x=>`<th style="text-align:right">${x.mes}</th>`).join('')}<th style="text-align:right">Total</th></tr>`;
+  h += `<tr><th>Item</th>${m.map(x=>`<th style="text-align:right">${x.mes}</th>`).join('')}<th style="text-align:right">Total</th><th style="text-align:right">Média</th></tr>`;
   const linhas = [
     ['Receitas',...m.map(x=>+x.rec_total),tR],
     ['— Salário',...m.map(x=>+x.rec_salario),m.reduce((s,x)=>s+(+x.rec_salario),0)],
@@ -272,7 +272,13 @@ function buildOverview() {
       const prefix=isSaldo?(v>=0?'+':'-'):(isDesp?'':'')
       return `<td class="num ${c}" style="${isSub?'color:var(--t3);font-size:11px':''}">${prefix}${fmt(v)}</td>`;
     }).join('');
-    h+=`<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}</tr>`;
+    const totalVal=vals[vals.length-1];
+    const numMeses=vals.length-1;
+    const mediaVal=numMeses>0?totalVal/numMeses:0;
+    let mc=''; if(isSaldo)mc=mediaVal>=0?'pos':'neg'; if(isDesp)mc='neg';
+    const mPrefix=isSaldo?(mediaVal>=0?'+':'-'):'';
+    const mediaCell=`<td class="num ${mc}" style="${isSub?'color:var(--t3);font-size:11px':'color:var(--t2)'}">${mPrefix}${fmt(mediaVal)}</td>`;
+    h+=`<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}${mediaCell}</tr>`;
   });
   h+=`</table></div>`;
 
@@ -426,7 +432,7 @@ function buildCategorias() {
     h+=`<div class="br-row"><span class="br-l" style="min-width:150px;font-size:11px">${n}</span><div class="br-t"><div class="br-f" style="width:${(v.total/mx*100).toFixed(1)}%;background:${cores[i%cores.length]}"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v.total)}</span></div>`;
   });
   h+=`</div><div class="cd"><div class="ct">Tabela comparativa</div><table>
-    <tr><th>Categoria</th>${mesesNomes.map(mn=>`<th style="text-align:right">${mn.slice(0,3)}</th>`).join('')}<th style="text-align:right">Total</th></tr>`;
+    <tr><th>Categoria</th>${mesesNomes.map(mn=>`<th style="text-align:right">${mn.slice(0,3)}</th>`).join('')}<th style="text-align:right">Total</th><th style="text-align:right">Média</th></tr>`;
   cats.forEach(([n,v])=>{
     h+=`<tr><td style="font-size:11px;font-weight:500">${n}</td>${mesesNomes.map(mn=>`<td class="num" style="font-size:11px">${fmt(v[mn]||0)}</td>`).join('')}<td class="num" style="font-size:11px;font-weight:600">${fmt(v.total)}</td></tr>`;
   });
