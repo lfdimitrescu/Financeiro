@@ -430,11 +430,27 @@ function renderMes(i){
 function buildCategorias() {
   const mesesNomes = MESES.map(m=>m.mes);
   const catMap = {};
+
+  // 1. Transações (cartão + pix + débito) — todos os meses
   TX.forEach(t=>{
+    if(+t.valor<=0) return;
     if(!catMap[t.categoria]) catMap[t.categoria]={total:0};
     if(!catMap[t.categoria][t.mes]) catMap[t.categoria][t.mes]=0;
     catMap[t.categoria][t.mes]+=parseFloat(t.valor);
     catMap[t.categoria].total+=parseFloat(t.valor);
+  });
+
+  // 2. Fixos para meses sem rastreamento individual (Jan-Abr)
+  // Nesses meses os custos fixos ficaram só em fixos, não em transacoes
+  const mesesSemPix = new Set(['Janeiro','Fevereiro','Marco','Abril']);
+  FIXOS.forEach(f=>{
+    if(!mesesSemPix.has(f.mes)) return; // Maio-Ago já têm em TX como debito/pix
+    if(+f.valor<=0) return;
+    const cat = f.nome;
+    if(!catMap[cat]) catMap[cat]={total:0};
+    if(!catMap[cat][f.mes]) catMap[cat][f.mes]=0;
+    catMap[cat][f.mes]+=parseFloat(f.valor);
+    catMap[cat].total+=parseFloat(f.valor);
   });
   const cats=Object.entries(catMap).filter(([,v])=>v.total>0).sort((a,b)=>b[1].total-a[1].total);
   const mx=cats[0]?.[1].total||1;
