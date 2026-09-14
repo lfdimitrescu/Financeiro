@@ -9,44 +9,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#F7F5F0;--s:#FFF;--s2:#F0EDE6;--bd:rgba(0,0,0,0.08);
-  --t:#1A1814;--t2:#6B6760;--t3:#9B9894;
-  --g:#1A5C3A;--gbg:#E8F5EE;--r:#8B1A1A;--rbg:#FAEAEA;
-  --a:#7A4E0D;--abg:#FDF3E3;--bl:#0D3B6E;--blbg:#E8F1FB;
-  --ac:#C8973A;--ac2:#1A3A2A;--rd:12px
-}
+:root{--bg:#F7F5F0;--s:#FFF;--s2:#F0EDE6;--bd:rgba(0,0,0,0.08);--t:#1A1814;--t2:#6B6760;--t3:#9B9894;--g:#1A5C3A;--gbg:#E8F5EE;--r:#8B1A1A;--rbg:#FAEAEA;--a:#7A4E0D;--abg:#FDF3E3;--bl:#0D3B6E;--blbg:#E8F1FB;--ac:#C8973A;--ac2:#1A3A2A;--rd:12px}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
-
-/* LOGIN */
 #login-screen{position:fixed;inset:0;background:var(--ac2);display:flex;align-items:center;justify-content:center;z-index:9999}
-.login-box{background:var(--s);border-radius:20px;padding:2.5rem;width:360px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.4)}
+.login-box{background:var(--s);border-radius:20px;padding:2.5rem;width:360px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.4)}
 .login-logo{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--ac2);margin-bottom:4px}.login-logo span{color:var(--ac)}
 .login-sub{font-size:12px;color:var(--t3);margin-bottom:28px}
 .login-input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-bottom:10px;transition:.2s}
 .login-input:focus{border-color:var(--ac)}
 .login-btn{width:100%;padding:11px;background:var(--ac2);color:#F7F5F0;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:.2s}
-.login-btn:hover{background:#243f30}
-.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-btn:hover{background:#243f30}.login-btn:disabled{opacity:.6;cursor:not-allowed}
 .login-err{color:var(--r);font-size:12px;margin-top:8px;display:none}
-.login-user{font-size:11px;color:var(--t3);margin-top:16px}
-
-/* NAV */
 nav{background:var(--ac2);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
 .nb{font-family:'DM Serif Display',serif;font-size:1.15rem;color:#F7F5F0}.nb span{color:var(--ac)}
 .nt{display:flex;gap:4px;flex-wrap:wrap}
 .nt button{background:0;border:0;cursor:pointer;padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(247,245,240,.6);transition:.15s}
-.nt button:hover{color:#F7F5F0;background:rgba(255,255,255,.1)}
-.nt button.on{color:#F7F5F0;background:rgba(255,255,255,.15)}
+.nt button:hover{color:#F7F5F0;background:rgba(255,255,255,.1)}.nt button.on{color:#F7F5F0;background:rgba(255,255,255,.15)}
 .nav-right{display:flex;align-items:center;gap:12px}
 .nav-user{font-size:11px;color:rgba(247,245,240,.5)}
-.logout-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(247,245,240,.7);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
-.logout-btn:hover{background:rgba(255,255,255,.1)}
-
+.logout-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(247,245,240,.7);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
 main{max-width:1200px;margin:0 auto;padding:1.5rem 2rem}
 .pg{display:none}.pg.on{display:block}
-
-/* CARDS */
 .hero{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:1.5rem}
 .hc{background:var(--s);border:1px solid var(--bd);border-radius:var(--rd);padding:1.1rem;position:relative;overflow:hidden}
 .hc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
@@ -54,16 +37,14 @@ main{max-width:1200px;margin:0 auto;padding:1.5rem 2rem}
 .hl{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .hv{font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1}
 .hs{font-size:11px;color:var(--t2);margin-top:5px}
-
 .sh{display:flex;align-items:baseline;gap:10px;margin:1.5rem 0 .8rem}
 .st{font-family:'DM Serif Display',serif;font-size:1.2rem}.ss{font-size:12px;color:var(--t3)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .cd{background:var(--s);border:1px solid var(--bd);border-radius:var(--rd);padding:1.25rem}
 .ct{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.8rem}
-.ms{display:flex;gap:6px;background:var(--s2);padding:3px;border-radius:8px;width:fit-content;margin-bottom:1rem}
+.ms{display:flex;gap:6px;background:var(--s2);padding:3px;border-radius:8px;width:fit-content;margin-bottom:1rem;flex-wrap:wrap}
 .ms button{background:0;border:0;cursor:pointer;padding:5px 16px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--t2);transition:.15s}
 .ms button:hover{color:var(--t)}.ms button.on{background:var(--s);color:var(--t);box-shadow:0 1px 3px rgba(0,0,0,.1)}
-
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{text-align:left;font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;padding:0 0 6px;border-bottom:1px solid var(--bd)}
 td{padding:7px 0;border-bottom:1px solid var(--bd)}.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
@@ -78,28 +59,16 @@ tr.tr td{font-weight:600;border-top:1px solid var(--bd);padding-top:10px}
 hr{border:0;border-top:1px solid var(--bd);margin:.8rem 0}
 .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
 .bg{background:var(--gbg);color:var(--g)}.br2{background:var(--rbg);color:var(--r)}
-
-/* LANÇAMENTOS */
 .filter-row{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
 .sel{padding:5px 12px;border:1px solid var(--bd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--s);color:var(--t)}
 .search-input{padding:5px 12px;border:1px solid var(--bd);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;flex:1;min-width:180px;background:var(--s)}
-.cat-badge{background:var(--s2);padding:1px 6px;border-radius:4px;cursor:pointer;transition:.15s}
-.cat-badge:hover{background:#e0ddd6}
-.cat-sel{font-size:11px;padding:2px 4px;border:1px solid var(--bd);border-radius:4px;background:var(--s)}
-
-/* TOAST */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A3A2A;color:#F7F5F0;padding:10px 20px;border-radius:8px;font-size:13px;z-index:10000;transition:opacity .3s;opacity:0;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-
-/* LOADING */
-.loading{text-align:center;padding:3rem;color:var(--t3);font-size:14px}
-
+.cat-badge{background:var(--s2);padding:1px 6px;border-radius:4px;cursor:pointer}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A3A2A;color:#F7F5F0;padding:10px 20px;border-radius:8px;font-size:13px;z-index:10000;transition:opacity .3s;opacity:0;pointer-events:none}
 .ft{text-align:center;padding:1.5rem;font-size:10px;color:var(--t3);margin-top:2rem}
 @media(max-width:768px){.hero{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}main{padding:1rem}}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">Financeiro <span>Familiar</span></div>
@@ -108,11 +77,9 @@ hr{border:0;border-top:1px solid var(--bd);margin:.8rem 0}
     <input type="password" id="pass-input" class="login-input" placeholder="Senha" onkeydown="if(event.key==='Enter')fazerLogin()">
     <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar</button>
     <div id="login-err" class="login-err"></div>
-    <div class="login-user">Acesso com seu email e senha cadastrados</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:16px">Acesso com seu email e senha cadastrados</div>
   </div>
 </div>
-
-<!-- NAV -->
 <nav>
   <div class="nb">Financeiro <span>Familiar</span></div>
   <div class="nt" id="tabs"></div>
@@ -121,149 +88,126 @@ hr{border:0;border-top:1px solid var(--bd);margin:.8rem 0}
     <button class="logout-btn" onclick="fazerLogout()">Sair</button>
   </div>
 </nav>
-
 <main>
   <div class="pg on" id="pg-overview"></div>
   <div class="pg" id="pg-mensal"></div>
   <div class="pg" id="pg-categorias"></div>
   <div class="pg" id="pg-lancamentos"></div>
 </main>
-
 <div id="toast"></div>
 <div class="ft">Financeiro Familiar · <span id="ft-dt"></span></div>
-
 <script>
-// ── SUPABASE ─────────────────────────────────────────────────
-const SUPA_URL = 'https://rirzmcsmlvktoohmrssy.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnptY3NtbHZrdG9vaG1yc3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTk4MDYsImV4cCI6MjA5NTAzNTgwNn0.e3q2RgR7f72axsrfXAFCZArQsjEqdxKm3WsKSdI4I-g';
-const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+const SUPA_URL='https://rirzmcsmlvktoohmrssy.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnptY3NtbHZrdG9vaG1yc3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTk4MDYsImV4cCI6MjA5NTAzNTgwNn0.e3q2RgR7f72axsrfXAFCZArQsjEqdxKm3WsKSdI4I-g';
+const sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
 
-// ── ESTADO GLOBAL ─────────────────────────────────────────────
-let USER = null;
-let MESES = [], TX = [], FIXOS = [], VIAGENS = [];
-let curMes = 0, txMesF = 'Todos', txCatF = 'Todas';
+let USER=null,MESES=[],TX=[],FIXOS=[],VIAGENS=[];
+let curMes=0,txMesF='Todos',txCatF='Todas',txTipoF='Todos';
 
-// ── UTILS ─────────────────────────────────────────────────────
-const fmt = v => 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fK = v => {const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1000?(a/1000).toFixed(1)+'k':a.toFixed(0))};
+const fmt=v=>'R$ '+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fK=v=>{const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1000?(a/1000).toFixed(1)+'k':a.toFixed(0))};
+const fN=v=>v===0?'<span style="color:#ccc">—</span>':Math.round(v).toLocaleString('pt-BR');
+const normMes=s=>s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
+const ordemMeses=['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-// ── AUTH ──────────────────────────────────────────────────────
-async function fazerLogin() {
-  const email = document.getElementById('email-input').value.trim();
-  const pass = document.getElementById('pass-input').value;
-  const btn = document.getElementById('login-btn');
-  const err = document.getElementById('login-err');
-  if (!email || !pass) { mostrarErro('Preencha email e senha'); return; }
-  btn.disabled = true; btn.textContent = 'Entrando...';
-  err.style.display = 'none';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { mostrarErro('Email ou senha incorretos'); btn.disabled=false; btn.textContent='Entrar'; return; }
-  USER = data.user;
+async function fazerLogin(){
+  const email=document.getElementById('email-input').value.trim();
+  const pass=document.getElementById('pass-input').value;
+  const btn=document.getElementById('login-btn');
+  const err=document.getElementById('login-err');
+  if(!email||!pass){mostrarErro('Preencha email e senha');return;}
+  btn.disabled=true;btn.textContent='Entrando...';
+  err.style.display='none';
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){mostrarErro('Email ou senha incorretos');btn.disabled=false;btn.textContent='Entrar';return;}
+  USER=data.user;
   await inicializar();
 }
 
-async function fazerLogout() {
+async function fazerLogout(){
   await sb.auth.signOut();
-  USER = null; MESES=[]; TX=[]; FIXOS=[]; VIAGENS=[];
-  document.getElementById('login-screen').style.display = 'flex';
+  USER=null;MESES=[];TX=[];FIXOS=[];VIAGENS=[];
+  document.getElementById('login-screen').style.display='flex';
 }
 
-function mostrarErro(msg) {
-  const err = document.getElementById('login-err');
-  err.textContent = msg; err.style.display = 'block';
+function mostrarErro(msg){
+  const e=document.getElementById('login-err');
+  e.textContent=msg;e.style.display='block';
 }
 
-// ── CARREGAR DADOS ────────────────────────────────────────────
-async function carregarDados() {
-  // Paginate transacoes to get ALL records past server 2000-row limit
-  async function fetchAll(table, opts={}) {
-    const pageSize = 1000;
-    let all = [], from = 0;
-    while (true) {
-      let q = sb.from(table).select('*').range(from, from + pageSize - 1);
-      if (opts.order) opts.order.forEach(([col, asc]) => { q = q.order(col, {ascending: asc !== false}); });
-      const { data, error } = await q;
-      if (error || !data || data.length === 0) break;
-      all = all.concat(data);
-      if (data.length < pageSize) break;
-      from += pageSize;
-    }
-    return all;
+async function fetchAll(table){
+  const pageSize=1000;let all=[],from=0;
+  while(true){
+    const {data,error}=await sb.from(table).select('*').order('id',{ascending:true}).range(from,from+pageSize-1);
+    if(error||!data||data.length===0)break;
+    all=all.concat(data);
+    if(data.length<pageSize)break;
+    from+=pageSize;
   }
+  return all;
+}
 
-  const [r1, txData, fixosData, viagData] = await Promise.all([
+async function carregarDados(){
+  const [r1,txData,fixosData,viagData]=await Promise.all([
     sb.from('meses').select('*').order('ano'),
     fetchAll('transacoes'),
     fetchAll('fixos'),
     fetchAll('viagens'),
   ]);
-  const ordemMeses = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const normMes = s => s.normalize('NFC').replace(/^Mar.o$/i,'Marco').replace('Março','Marco').replace('março','Marco');
-  MESES = (r1.data || []).map(m=>({...m,mes:normMes(m.mes)})).sort((a,b) => ordemMeses.indexOf(a.mes) - ordemMeses.indexOf(b.mes));
-  TX = txData.map(t => ({...t, mes: normMes(t.mes)}));
-  FIXOS = fixosData.map(f=>({...f,mes:normMes(f.mes)}));
-  VIAGENS = viagData.map(v=>({...v,mes:normMes(v.mes)}));
+  MESES=(r1.data||[]).map(m=>({...m,mes:normMes(m.mes)})).sort((a,b)=>ordemMeses.indexOf(a.mes)-ordemMeses.indexOf(b.mes));
+  TX=txData.map(t=>({...t,mes:normMes(t.mes)}));
+  FIXOS=fixosData.map(f=>({...f,mes:normMes(f.mes)}));
+  VIAGENS=viagData.map(v=>({...v,mes:normMes(v.mes)}));
 }
 
-// ── INICIALIZAR ───────────────────────────────────────────────
-async function inicializar() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('nav-user').textContent = USER.email;
-  document.getElementById('ft-dt').textContent = new Date().toLocaleDateString('pt-BR');
-
-  document.getElementById('pg-overview').innerHTML = '<div class="loading">Carregando dados...</div>';
-
+async function inicializar(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('nav-user').textContent=USER.email;
+  document.getElementById('ft-dt').textContent=new Date().toLocaleDateString('pt-BR');
+  document.getElementById('pg-overview').innerHTML='<div style="text-align:center;padding:3rem;color:var(--t3)">Carregando...</div>';
   await carregarDados();
-  buildTabs();
-  buildOverview();
-  buildMensal();
-  buildCategorias();
-  buildLancamentos();
+  buildTabs();buildOverview();buildMensal();buildCategorias();buildLancamentos();
 }
 
-// ── TABS ──────────────────────────────────────────────────────
-const PAGES = ['overview','mensal','categorias','lancamentos'];
-const LABELS = ['Visão Geral','Por Mês','Categorias','Lançamentos'];
-function buildTabs() {
-  document.getElementById('tabs').innerHTML = PAGES.map((p,i) =>
-    `<button class="${i===0?'on':''}" onclick="showP('${p}',this)">${LABELS[i]}</button>`
-  ).join('');
+const PAGES=['overview','mensal','categorias','lancamentos'];
+const LABELS=['Visão Geral','Por Mês','Categorias','Lançamentos'];
+function buildTabs(){
+  document.getElementById('tabs').innerHTML=PAGES.map((p,i)=>`<button class="${i===0?'on':''}" onclick="showP('${p}',this)">${LABELS[i]}</button>`).join('');
 }
-function showP(p, btn) {
-  PAGES.forEach(x => document.getElementById('pg-'+x).classList.remove('on'));
+function showP(p,btn){
+  PAGES.forEach(x=>document.getElementById('pg-'+x).classList.remove('on'));
   document.getElementById('pg-'+p).classList.add('on');
-  document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('on'));
-  if(btn) btn.classList.add('on');
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
 }
 
-// ── OVERVIEW ──────────────────────────────────────────────────
-function buildOverview() {
-  const m = MESES;
-  const tR = m.reduce((s,x)=>s+parseFloat(x.rec_total||0),0);
-  const tC = m.reduce((s,x)=>s+parseFloat(x.cart_total||0),0);
-  const tF = m.reduce((s,x)=>s+parseFloat(x.fixos_total||0),0);
-  const tV = m.reduce((s,x)=>s+parseFloat(x.viagens_total||0),0);
-  const tFe = m.reduce((s,x)=>s+parseFloat(x.festa_total||0),0);
-  const tD = tC+tV+tF+tFe;
-  const tS = m.reduce((s,x)=>s+parseFloat(x.saldo||0),0);
+function buildOverview(){
+  const m=MESES;
+  const tR=m.reduce((s,x)=>s+parseFloat(x.rec_total||0),0);
+  const tC=m.reduce((s,x)=>s+parseFloat(x.cart_total||0),0);
+  const tF=m.reduce((s,x)=>s+parseFloat(x.fixos_total||0),0);
+  const tV=m.reduce((s,x)=>s+parseFloat(x.viagens_total||0),0);
+  const tFe=m.reduce((s,x)=>s+parseFloat(x.festa_total||0),0);
+  const tD=tC+tV+tF+tFe;
+  const tS=m.reduce((s,x)=>s+parseFloat(x.saldo||0),0);
 
-  let h = `<div class="sh" style="margin-top:1rem"><div class="st">Consolidado 2026</div><div class="ss">${m.map(x=>x.mes).join(' · ')}</div></div>`;
-  h += `<div class="hero">
+  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Consolidado 2026</div><div class="ss">${m.map(x=>x.mes).join(' · ')}</div></div>`;
+  h+=`<div class="hero">
     <div class="hc cg"><div class="hl">Receitas</div><div class="hv">${fK(tR)}</div><div class="hs">${m.length} meses</div></div>
-    <div class="hc cr"><div class="hl">Despesas totais</div><div class="hv">${fK(tD)}</div><div class="hs">cartões + viagens + fixos</div></div>
+    <div class="hc cr"><div class="hl">Despesas totais</div><div class="hv">${fK(tD)}</div><div class="hs">cartões+viagens+fixos+festa</div></div>
     <div class="hc ca"><div class="hl">Cartões</div><div class="hv">${fK(tC)}</div><div class="hs">Itaú + XP</div></div>
     <div class="hc ${tS>=0?'cg':'cr'}"><div class="hl">Saldo acumulado</div><div class="hv">${fK(tS)}</div><span class="badge ${tS>=0?'bg':'br2'}">${tS>=0?'Positivo':'Negativo'}</span></div>
   </div>`;
 
-  h += `<div class="g2">
+  h+=`<div class="g2">
     <div class="cd"><div class="ct">Receitas vs Despesas</div><div class="cw" style="height:210px"><canvas id="c1"></canvas></div></div>
     <div class="cd"><div class="ct">Saldo mensal</div><div class="cw" style="height:210px"><canvas id="c2"></canvas></div></div>
   </div>`;
 
-  // Comparativo
-  h += `<div class="sh"><div class="st">Resumo comparativo</div></div><div class="cd"><table>`;
-  h += `<tr><th>Item</th>${m.map(x=>`<th style="text-align:right">${x.mes}</th>`).join('')}<th style="text-align:right">Total</th><th style="text-align:right">Média</th></tr>`;
-  const linhas = [
+  h+=`<div class="sh"><div class="st">Resumo comparativo</div></div><div class="cd"><div style="overflow-x:auto"><table>`;
+  h+=`<tr><th>Item</th>${m.map(x=>`<th style="text-align:right">${x.mes.slice(0,3)}</th>`).join('')}<th style="text-align:right">Total</th><th style="text-align:right;color:var(--t2)">Média</th></tr>`;
+
+  const linhas=[
     ['Receitas',...m.map(x=>+x.rec_total),tR],
     ['— Salário',...m.map(x=>+x.rec_salario),m.reduce((s,x)=>s+(+x.rec_salario),0)],
     ['— Dividendos',...m.map(x=>+x.rec_dividendos),m.reduce((s,x)=>s+(+x.rec_dividendos),0)],
@@ -278,24 +222,21 @@ function buildOverview() {
     ['SALDO',...m.map(x=>+x.saldo),tS],
   ];
   linhas.forEach(([nome,...vals])=>{
-    const isSaldo=nome==='SALDO', isDesp=nome==='Despesas totais', isSub=nome.startsWith('—');
+    const isSaldo=nome==='SALDO',isDesp=nome==='Despesas totais',isSub=nome.startsWith('—');
     const cls=isSaldo||isDesp?'tr':'';
+    const total=vals[vals.length-1];
+    const media=vals.length>1?total/(vals.length-1):0;
     const cells=vals.map(v=>{
-      let c=''; if(isSaldo)c=v>=0?'pos':'neg'; if(isDesp)c='neg';
-      const prefix=isSaldo?(v>=0?'+':'-'):(isDesp?'':'')
-      return `<td class="num ${c}" style="${isSub?'color:var(--t3);font-size:11px':''}">${prefix}${fmt(v)}</td>`;
+      let cc='';if(isSaldo)cc=v>=0?'pos':'neg';if(isDesp)cc='neg';
+      const px=isSaldo?(v>=0?'+':'-'):'';
+      return `<td class="num ${cc}" style="${isSub?'color:var(--t3);font-size:11px':''}">${px}${fmt(v)}</td>`;
     }).join('');
-    const totalVal=vals[vals.length-1];
-    const numMeses=vals.length-1;
-    const mediaVal=numMeses>0?totalVal/numMeses:0;
-    let mc=''; if(isSaldo)mc=mediaVal>=0?'pos':'neg'; if(isDesp)mc='neg';
-    const mPrefix=isSaldo?(mediaVal>=0?'+':'-'):'';
-    const mediaCell=`<td class="num ${mc}" style="${isSub?'color:var(--t3);font-size:11px':'color:var(--t2)'}">${mPrefix}${fmt(mediaVal)}</td>`;
-    h+=`<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}${mediaCell}</tr>`;
+    let mc='';if(isSaldo)mc=media>=0?'pos':'neg';if(isDesp)mc='neg';
+    const mp=isSaldo?(media>=0?'+':'-'):'';
+    h+=`<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}<td class="num ${mc}" style="color:var(--t2);font-size:11px">${mp}${fmt(media)}</td></tr>`;
   });
-  h+=`</table></div>`;
+  h+=`</table></div></div>`;
 
-  // Maiores fixos
   const fmap={};
   FIXOS.forEach(f=>{if(+f.valor>0){if(!fmap[f.nome])fmap[f.nome]=0;fmap[f.nome]+=+f.valor}});
   const fsorted=Object.entries(fmap).sort((a,b)=>b[1]-a[1]).slice(0,10);
@@ -317,58 +258,50 @@ function buildOverview() {
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
 }
 
-// ── MENSAL ────────────────────────────────────────────────────
-function buildMensal() {
+function buildMensal(){
   let h=`<div class="sh" style="margin-top:1rem"><div class="st">Resumo mensal</div></div>`;
   h+=`<div class="ms" id="ms-sel">${MESES.map((m,i)=>`<button class="${i===0?'on':''}" onclick="selMes(${i},this)">${m.mes}</button>`).join('')}<button onclick="selMesTotal(this)">Total</button></div>`;
   h+=`<div id="mes-detail"></div>`;
   document.getElementById('pg-mensal').innerHTML=h;
   renderMes(0);
 }
+
 function selMesTotal(btn){
   document.querySelectorAll('#ms-sel button').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
-  renderMesTotal();
-}
-function renderMesTotal(){
   const tR=MESES.reduce((s,m)=>s+parseFloat(m.rec_total||0),0);
   const tC=MESES.reduce((s,m)=>s+parseFloat(m.cart_total||0),0);
   const tF=MESES.reduce((s,m)=>s+parseFloat(m.fixos_total||0),0);
   const tV=MESES.reduce((s,m)=>s+parseFloat(m.viagens_total||0),0);
-  const tS=MESES.reduce((s,m)=>s+parseFloat(m.saldo||0),0);
-  const tFe2=MESES.reduce((s,m)=>s+parseFloat(m.festa_total||0),0);
-  const tot=tC+tV+tF+tFe2;
+  const tFe=MESES.reduce((s,m)=>s+parseFloat(m.festa_total||0),0);
+  const tot=tC+tV+tF+tFe;
   const fmap={};
   FIXOS.forEach(f=>{if(+f.valor>0){if(!fmap[f.nome])fmap[f.nome]=0;fmap[f.nome]+=+f.valor;}});
   const fixSorted=Object.entries(fmap).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
   const vmap={};
   VIAGENS.forEach(v=>{if(!vmap[v.destino])vmap[v.destino]=0;vmap[v.destino]+=+v.valor;});
   let h=`<div class="g2">
-    <div class="cd"><div class="ct">Receitas & Cartões — Total Anual</div><table>
+    <div class="cd"><div class="ct">Receitas & Cartões — Total</div><table>
       <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
       <tr><td>Salário</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_salario||0),0))}</td></tr>
       ${MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0)>0?`<tr><td>Dividendos</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0))}</td></tr>`:''}
       <tr><td>PJ Andressa</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_pj_andressa||0),0))}</td></tr>
-      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0)>0?`<tr><td>Outros</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0))}</td></tr>`:''}
       <tr class="tr"><td>Total Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
     </table><hr><table>
       <tr><td>Cartão Itaú</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_itau||0),0))}</td></tr>
       <tr><td>Cartão XP</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_xp||0),0))}</td></tr>
       <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(tC)}</td></tr>
-    </table>
-    ${Object.keys(vmap).length?`<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${Object.entries(vmap).sort((a,b)=>b[1]-a[1]).map(([d,v])=>`<tr><td>${d}</td><td class="num">${fmt(v)}</td></tr>`).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(tV)}</td></tr></table>`:''}
-    <hr>
+    </table><hr>
     <table style="margin-bottom:8px">
       <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(tC)}</td></tr>
-      <tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(tV)}</td></tr>
-      ${tFe2>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(tFe2)}</td></tr>`:''}
+      ${tV>0?`<tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(tV)}</td></tr>`:''}
+      ${tFe>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(tFe)}</td></tr>`:''}
       <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(tF)}</td></tr>
       <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
       <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
     </table>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-      <div><div class="hl">Saldo acumulado</div><div class="${tS>=0?'sp':'sn'}">${tS>=0?'+':''}${fmt(tS)}</div></div>
-    </div></div>
+    <div><div class="hl">Saldo acumulado</div><div class="${MESES.reduce((s,m)=>s+parseFloat(m.saldo||0),0)>=0?'sp':'sn'}">${MESES.reduce((s,m)=>s+parseFloat(m.saldo||0),0)>=0?'+':''}${fmt(MESES.reduce((s,m)=>s+parseFloat(m.saldo||0),0))}</div></div>
+    </div>
     <div class="cd"><div class="ct">Fixos acumulados</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Total</th><th style="text-align:right">Média/mês</th></tr>
       ${fixSorted.map(([n,v])=>`<tr><td>${n}</td><td class="num">${fmt(v)}</td><td class="num" style="color:var(--t3)">${fmt(v/MESES.length)}</td></tr>`).join('')}
@@ -377,18 +310,20 @@ function renderMesTotal(){
   </div>`;
   document.getElementById('mes-detail').innerHTML=h;
 }
+
 function selMes(i,btn){
   curMes=i;
   document.querySelectorAll('#ms-sel button').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
   renderMes(i);
 }
+
 function renderMes(i){
-  const m=MESES[i];
-  if(!m)return;
-  const viaM = VIAGENS.filter(v=>v.mes===m.mes);
-  const fixM = FIXOS.filter(f=>f.mes===m.mes&&+f.valor>0).sort((a,b)=>+b.valor-+a.valor);
-  const tot=(+m.cart_total)+(+m.viagens_total)+(+m.fixos_total)+(+(m.festa_total||0));
+  const m=MESES[i];if(!m)return;
+  const viaM=VIAGENS.filter(v=>v.mes===m.mes);
+  const fixM=FIXOS.filter(f=>f.mes===m.mes&&+f.valor>0).sort((a,b)=>+b.valor-+a.valor);
+  const festa=+(m.festa_total||0);
+  const tot=(+m.cart_total)+(+m.viagens_total)+(+m.fixos_total)+festa;
   let h=`<div class="g2">
     <div class="cd"><div class="ct">Receitas & Cartões — ${m.mes}</div><table>
       <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
@@ -407,69 +342,48 @@ function renderMes(i){
     <table style="margin-bottom:8px">
       <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(+m.cart_total)}</td></tr>
       ${viaM.length?`<tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(+m.viagens_total)}</td></tr>`:''}
-      ${+(m.festa_total||0)>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(+(m.festa_total||0))}</td></tr>`:''}
+      ${festa>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(festa)}</td></tr>`:''}
       <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(+m.fixos_total)}</td></tr>
       <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
       <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
     </table>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-      <div><div class="hl">Saldo do mês</div><div class="${+m.saldo>=0?'sp':'sn'}">${+m.saldo>=0?'+':'-'}${fmt(+m.saldo)}</div></div>
-    </div></div>
+    <div><div class="hl">Saldo do mês</div><div class="${+m.saldo>=0?'sp':'sn'}">${+m.saldo>=0?'+':'-'}${fmt(+m.saldo)}</div></div>
+    </div>
     <div class="cd"><div class="ct">Fixos — ${m.mes}</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Valor</th></tr>
-      ${fixM.map(f=>`<tr><td style="${+f.valor===0?'color:var(--t3)':''}">${f.nome}</td><td class="num">${fmt(+f.valor)}</td></tr>`).join('')}
+      ${fixM.map(f=>`<tr><td>${f.nome}</td><td class="num">${fmt(+f.valor)}</td></tr>`).join('')}
       <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(+m.fixos_total)}</td></tr>
     </table></div>
   </div>`;
   document.getElementById('mes-detail').innerHTML=h;
 }
 
-// ── CATEGORIAS ────────────────────────────────────────────────
-function buildCategorias() {
-  const mesesNomes = MESES.map(m=>m.mes);
-  const catMap = {};
-
-  function addCat(cat, mes, val) {
-    if(+val<=0) return;
-    if(!catMap[cat]) catMap[cat]={total:0};
-    if(!catMap[cat][mes]) catMap[cat][mes]=0;
+function buildCategorias(){
+  const mesesNomes=MESES.map(m=>m.mes);
+  const catMap={};
+  function addCat(cat,mes,val){
+    if(+val<=0)return;
+    if(!catMap[cat])catMap[cat]={total:0};
+    if(!catMap[cat][mes])catMap[cat][mes]=0;
     catMap[cat][mes]+=parseFloat(val);
     catMap[cat].total+=parseFloat(val);
   }
-
-  // 1. Cartão (todos os meses) — gastos variáveis no cartão
-  TX.filter(t=>t.tipo==='cartao').forEach(t=>addCat(t.categoria, t.mes, t.valor));
-
-  // 2. FIXOS (todos os meses) — custos fixos recorrentes
-  // São a fonte primária para: escola, babá, luz, gás, condomínio, etc.
-  const FIXOS_CATS = new Set();
-  FIXOS.forEach(f=>{
-    addCat(f.nome, f.mes, f.valor);
-    FIXOS_CATS.add(f.nome);
-  });
-
-  // 3. PIX variáveis (apenas categorias NÃO cobertas pelos FIXOS)
-  // Evita dupla contagem: babá já está em FIXOS como 'Babá (Carolin)'
-  const PIX_SKIP = new Set([
-    'Funcionários/Serviços','Escola dos Filhos','Condomínio',
-    'Financiamento Imobiliário','Energia - Light','Internet/Tel - Vivo',
-    'Gás - CEG','IPTU (BKI RIO)','Impostos & Taxas','Despesas PJ (Andressa)',
-    'Babá (Carolin)','Babá (Carol)','Tarifa Bancária Bradesco','Outros PIX enviados',
-    'Carro','Educação & Trabalho'
-  ]);
-  TX.filter(t=>t.tipo==='pix' && !PIX_SKIP.has(t.categoria)).forEach(t=>addCat(t.categoria, t.mes, t.valor));
+  TX.filter(t=>t.tipo==='cartao').forEach(t=>addCat(t.categoria,t.mes,t.valor));
+  FIXOS.filter(f=>+f.valor>0).forEach(f=>addCat(f.nome,f.mes,f.valor));
+  const PIX_SKIP=new Set(['Funcionários/Serviços','Escola dos Filhos','Condomínio','Financiamento Imobiliário','Energia - Light','Internet/Tel - Vivo','Gás - CEG','IPTU (BKI RIO)','Impostos & Taxas','Despesas PJ (Andressa)','Babá (Carolin)','Tarifa Bancária Bradesco','Outros PIX enviados','Carro']);
+  TX.filter(t=>t.tipo==='pix'&&!PIX_SKIP.has(t.categoria)).forEach(t=>addCat(t.categoria,t.mes,t.valor));
   const cats=Object.entries(catMap).filter(([,v])=>v.total>0).sort((a,b)=>b[1].total-a[1].total);
   const mx=cats[0]?.[1].total||1;
-  const cores=['#1A5C3A','#2D7A4F','#C8973A','#D4A84E','#0D3B6E','#1A5C8A','#8B1A1A','#A03333','#4A7C59','#6BBF8E','#7A4E0D','#9B6A2A','#2A4A7A','#5A7A3A','#7A2A5A'];
+  const cores=['#1A5C3A','#2D7A4F','#C8973A','#D4A84E','#0D3B6E','#1A5C8A','#8B1A1A','#A03333','#4A7C59','#6BBF8E','#7A4E0D','#9B6A2A'];
 
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Gastos por categoria</div><div class="ss">cartões Itaú + XP</div></div>`;
+  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Gastos por categoria</div><div class="ss">cartão + fixos + PIX variáveis</div></div>`;
   h+=`<div class="cd" style="margin-bottom:14px"><div class="ct">Top 6 — evolução mensal</div><div class="cw" style="height:280px"><canvas id="cCat"></canvas></div></div>`;
   h+=`<div class="g2"><div class="cd"><div class="ct">Ranking acumulado</div>`;
   cats.forEach(([n,v],i)=>{
     h+=`<div class="br-row"><span class="br-l" style="min-width:150px;font-size:11px">${n}</span><div class="br-t"><div class="br-f" style="width:${(v.total/mx*100).toFixed(1)}%;background:${cores[i%cores.length]}"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v.total)}</span></div>`;
   });
   h+=`</div></div>`;
-  // Tabela comparativa full-width
+
   h+=`<div class="cd" style="margin-top:14px"><div class="ct">Tabela comparativa <span style="color:var(--t3);font-weight:400">(R$ arredondado)</span></div>
   <div style="overflow-x:auto">
   <table style="border-collapse:collapse;width:100%;white-space:nowrap">
@@ -480,10 +394,9 @@ function buildCategorias() {
       <th style="text-align:right;padding:8px 0 8px 10px;font-size:10px;color:var(--t3);letter-spacing:.06em">MÉDIA</th>
     </tr></thead>
     <tbody>`;
-  const fN = v => v===0 ? '<span style="color:#ddd">—</span>' : Math.round(v).toLocaleString('pt-BR');
   cats.forEach(([n,v],i)=>{
-    const media = v.total / mesesNomes.length;
-    const bg = i%2===0?'var(--s2)':'var(--s)';
+    const media=v.total/mesesNomes.length;
+    const bg=i%2===0?'var(--s2)':'var(--s)';
     h+=`<tr style="background:${bg};border-bottom:1px solid var(--bd)">
       <td style="padding:8px 16px 8px 0;font-size:12px;font-weight:500">${n}</td>
       ${mesesNomes.map(mn=>`<td style="text-align:right;padding:8px 10px;font-size:12px;color:${(v[mn]||0)===0?'#ccc':'var(--t)'}">${fN(v[mn]||0)}</td>`).join('')}
@@ -493,12 +406,11 @@ function buildCategorias() {
   });
   const totRow=mesesNomes.map(mn=>cats.reduce((s,[,v])=>s+(v[mn]||0),0));
   const grandTotal=cats.reduce((s,[,v])=>s+v.total,0);
-  const grandMedia=grandTotal/mesesNomes.length;
   h+=`<tr style="border-top:2px solid var(--t);font-weight:700;background:var(--s)">
     <td style="padding:10px 16px 10px 0;font-size:12px">TOTAL</td>
     ${totRow.map(v=>`<td style="text-align:right;padding:10px;font-size:12px">${fN(v)}</td>`).join('')}
     <td style="text-align:right;padding:10px;font-size:12px;border-left:2px solid var(--bd)">${fN(grandTotal)}</td>
-    <td style="text-align:right;padding:10px 0 10px 10px;font-size:12px;color:var(--t2)">${fN(grandMedia)}</td>
+    <td style="text-align:right;padding:10px 0 10px 10px;font-size:12px;color:var(--t2)">${fN(grandTotal/mesesNomes.length)}</td>
   </tr>`;
   h+=`</tbody></table></div></div>`;
   document.getElementById('pg-categorias').innerHTML=h;
@@ -509,14 +421,9 @@ function buildCategorias() {
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}}},scales:{y:{stacked:true,ticks:{callback:v=>fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}}}}});
 }
 
-
-
-// ── LANÇAMENTOS ───────────────────────────────────────────────
-let txTipoF='Todos';
-function buildLancamentos() {
+function buildLancamentos(){
   const allMeses=['Todos',...new Set(TX.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
   const allCats=['Todas',...new Set(TX.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
-
   let h=`<div class="sh" style="margin-top:1rem"><div class="st">Lançamentos</div><div class="ss" id="tx-cnt"></div></div>`;
   h+=`<div class="filter-row">
     <select class="sel" id="tx-mf" onchange="txMesF=this.value;renderTx()">${allMeses.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
@@ -529,14 +436,14 @@ function buildLancamentos() {
     <select class="sel" id="tx-cf" onchange="txCatF=this.value;renderTx()">${allCats.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
     <input type="text" class="search-input" id="tx-q" placeholder="Buscar..." oninput="renderTx()">
   </div>`;
-  h+=`<div class="cd" style="max-height:550px;overflow-y:auto"><table><thead style="position:sticky;top:0;background:var(--s)">
+  h+=`<div class="cd" style="max-height:600px;overflow-y:auto"><table><thead style="position:sticky;top:0;background:var(--s)">
     <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Origem</th><th style="text-align:right">Valor</th></tr>
   </thead><tbody id="tx-tb"></tbody></table></div>`;
   document.getElementById('pg-lancamentos').innerHTML=h;
   renderTx();
 }
 
-function renderTx() {
+function renderTx(){
   const q=(document.getElementById('tx-q')?.value||'').toLowerCase();
   let f=TX.filter(t=>+t.valor>0);
   if(txMesF!=='Todos')f=f.filter(t=>t.mes===txMesF);
@@ -553,24 +460,23 @@ function renderTx() {
     return `<tr style="background:${bg}">
       <td style="font-size:11px;white-space:nowrap">${t.data}</td>
       <td style="font-size:11px">${t.estabelecimento}</td>
-      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\'")}',this)" title="Clique para alterar">${t.categoria} ✎</span></td>
+      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\\'")}',this)">${t.categoria} ✎</span></td>
       <td style="font-size:11px;color:${tipoColor(t)};font-weight:500">${tipoLabel(t)}</td>
       <td class="num" style="font-size:11px;font-weight:500">${fmt(parseFloat(t.valor))}</td>
     </tr>`;
   }).join('');
 }
 
-async function editCat(id, catAtual, el) {
+async function editCat(id,catAtual,el){
   const allCats=[...new Set(TX.map(t=>t.categoria))].sort();
   const sel=document.createElement('select');
-  sel.className='cat-sel';
+  sel.className='cat-badge';
+  sel.style.fontSize='11px';
   allCats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===catAtual)o.selected=true;sel.appendChild(o);});
-  const nova=document.createElement('option');nova.value='__nova__';nova.textContent='+ Nova...';sel.appendChild(nova);
   el.replaceWith(sel);
   sel.focus();
   sel.onchange=async()=>{
-    let val=sel.value;
-    if(val==='__nova__'){val=prompt('Nome da nova categoria:');if(!val){renderTx();return;}}
+    const val=sel.value;
     const estab=TX.find(t=>t.id===id)?.estabelecimento;
     const {error}=await sb.from('transacoes').update({categoria:val}).eq('estabelecimento',estab);
     if(!error){TX.forEach(t=>{if(t.estabelecimento===estab)t.categoria=val;});showToast(`${estab} → ${val}`);renderTx();buildCategorias();}
@@ -580,13 +486,9 @@ async function editCat(id, catAtual, el) {
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>{t.style.opacity='0'},3000)}
 
-// ── INIT ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    USER = session.user;
-    await inicializar();
-  }
+document.addEventListener('DOMContentLoaded',async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){USER=session.user;await inicializar();}
 });
 </script>
 </body>
