@@ -512,7 +512,7 @@ function buildCategorias() {
 
 
 // ── LANÇAMENTOS ───────────────────────────────────────────────
-let txMesF='Todos', txCatF='Todas', txTipoF='Todos';
+let txTipoF='Todos';
 function buildLancamentos() {
   const allMeses=['Todos',...new Set(TX.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
   const allCats=['Todas',...new Set(TX.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
