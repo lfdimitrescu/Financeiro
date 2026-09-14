@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+,::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#F7F5F0;--s:#FFF;--s2:#F0EDE6;--bd:rgba(0,0,0,0.08);
   --t:#1A1814;--t2:#6B6760;--t3:#9B9894;
@@ -127,7 +127,6 @@ hr{border:0;border-top:1px solid var(--bd);margin:.8rem 0}
   <div class="pg" id="pg-mensal"></div>
   <div class="pg" id="pg-categorias"></div>
   <div class="pg" id="pg-lancamentos"></div>
-  <div class="pg" id="pg-transferencias"></div>
 </main>
 
 <div id="toast"></div>
@@ -220,15 +219,14 @@ async function inicializar() {
   buildMensal();
   buildCategorias();
   buildLancamentos();
-  buildTransferencias();
 }
 
 // ── TABS ──────────────────────────────────────────────────────
-const PAGES = ['overview','mensal','categorias','lancamentos','transferencias'];
-const LABELS = ['Visão Geral','Por Mês','Categorias','Lançamentos','Transferências'];
+const PAGES = ['overview','mensal','categorias','lancamentos'];
+const LABELS = ['Visão Geral','Por Mês','Categorias','Lançamentos'];
 function buildTabs() {
   document.getElementById('tabs').innerHTML = PAGES.map((p,i) =>
-    `<button class="${i===0?'on':''}" onclick="showP('${p}',this)">${LABELS[i]}</button>`
+    <button class="${i===0?'on':''}" onclick="showP('${p}',this)">${LABELS[i]}</button>
   ).join('');
 }
 function showP(p, btn) {
@@ -249,7 +247,7 @@ function buildOverview() {
   const tD = tC+tV+tF+tFe;
   const tS = m.reduce((s,x)=>s+parseFloat(x.saldo||0),0);
 
-  let h = `<div class="sh" style="margin-top:1rem"><div class="st">Consolidado 2026</div><div class="ss">${m.map(x=>x.mes).join(' · ')}</div></div>`;
+  let h = <div class="sh" style="margin-top:1rem"><div class="st">Consolidado 2026</div><div class="ss">${m.map(x=>x.mes).join(' · ')}</div></div>;
   h += `<div class="hero">
     <div class="hc cg"><div class="hl">Receitas</div><div class="hv">${fK(tR)}</div><div class="hs">${m.length} meses</div></div>
     <div class="hc cr"><div class="hl">Despesas totais</div><div class="hv">${fK(tD)}</div><div class="hs">cartões + viagens + fixos</div></div>
@@ -263,8 +261,8 @@ function buildOverview() {
   </div>`;
 
   // Comparativo
-  h += `<div class="sh"><div class="st">Resumo comparativo</div></div><div class="cd"><table>`;
-  h += `<tr><th>Item</th>${m.map(x=>`<th style="text-align:right">${x.mes}</th>`).join('')}<th style="text-align:right">Total</th><th style="text-align:right">Média</th></tr>`;
+  h += <div class="sh"><div class="st">Resumo comparativo</div></div><div class="cd"><table>;
+  h += <tr><th>Item</th>${m.map(x=><th style="text-align:right">${x.mes}</th>).join('')}<th style="text-align:right">Total</th><th style="text-align:right">Média</th></tr>;
   const linhas = [
     ['Receitas',...m.map(x=>+x.rec_total),tR],
     ['— Salário',...m.map(x=>+x.rec_salario),m.reduce((s,x)=>s+(+x.rec_salario),0)],
@@ -285,28 +283,28 @@ function buildOverview() {
     const cells=vals.map(v=>{
       let c=''; if(isSaldo)c=v>=0?'pos':'neg'; if(isDesp)c='neg';
       const prefix=isSaldo?(v>=0?'+':'-'):(isDesp?'':'')
-      return `<td class="num ${c}" style="${isSub?'color:var(--t3);font-size:11px':''}">${prefix}${fmt(v)}</td>`;
+      return <td class="num ${c}" style="${isSub?'color:var(--t3);font-size:11px':''}">${prefix}${fmt(v)}</td>;
     }).join('');
     const totalVal=vals[vals.length-1];
     const numMeses=vals.length-1;
     const mediaVal=numMeses>0?totalVal/numMeses:0;
     let mc=''; if(isSaldo)mc=mediaVal>=0?'pos':'neg'; if(isDesp)mc='neg';
     const mPrefix=isSaldo?(mediaVal>=0?'+':'-'):'';
-    const mediaCell=`<td class="num ${mc}" style="${isSub?'color:var(--t3);font-size:11px':'color:var(--t2)'}">${mPrefix}${fmt(mediaVal)}</td>`;
-    h+=`<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}${mediaCell}</tr>`;
+    const mediaCell=<td class="num ${mc}" style="${isSub?'color:var(--t3);font-size:11px':'color:var(--t2)'}">${mPrefix}${fmt(mediaVal)}</td>;
+    h+=<tr class="${cls}"><td style="${isSub?'padding-left:14px;color:var(--t3);font-size:11px':''}">${nome}</td>${cells}${mediaCell}</tr>;
   });
-  h+=`</table></div>`;
+  h+=</table></div>;
 
   // Maiores fixos
   const fmap={};
   FIXOS.forEach(f=>{if(+f.valor>0){if(!fmap[f.nome])fmap[f.nome]=0;fmap[f.nome]+=+f.valor}});
   const fsorted=Object.entries(fmap).sort((a,b)=>b[1]-a[1]).slice(0,10);
   const fmax=fsorted[0]?.[1]||1;
-  h+=`<div class="sh"><div class="st">Maiores fixos</div><div class="ss">acumulado</div></div><div class="cd">`;
+  h+=<div class="sh"><div class="st">Maiores fixos</div><div class="ss">acumulado</div></div><div class="cd">;
   fsorted.forEach(([n,v])=>{
-    h+=`<div class="br-row"><span class="br-l">${n}</span><div class="br-t"><div class="br-f" style="width:${(v/fmax*100).toFixed(1)}%;background:var(--ac)"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v/MESES.length)}/mês</span></div>`;
+    h+=<div class="br-row"><span class="br-l">${n}</span><div class="br-t"><div class="br-f" style="width:${(v/fmax*100).toFixed(1)}%;background:var(--ac)"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v/MESES.length)}/mês</span></div>;
   });
-  h+=`</div>`;
+  h+=</div>;
 
   document.getElementById('pg-overview').innerHTML=h;
 
@@ -321,9 +319,9 @@ function buildOverview() {
 
 // ── MENSAL ────────────────────────────────────────────────────
 function buildMensal() {
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Resumo mensal</div></div>`;
-  h+=`<div class="ms" id="ms-sel">${MESES.map((m,i)=>`<button class="${i===0?'on':''}" onclick="selMes(${i},this)">${m.mes}</button>`).join('')}<button onclick="selMesTotal(this)">Total</button></div>`;
-  h+=`<div id="mes-detail"></div>`;
+  let h=<div class="sh" style="margin-top:1rem"><div class="st">Resumo mensal</div></div>;
+  h+=<div class="ms" id="ms-sel">${MESES.map((m,i)=><button class="${i===0?'on':''}" onclick="selMes(${i},this)">${m.mes}</button>).join('')}<button onclick="selMesTotal(this)">Total</button></div>;
+  h+=<div id="mes-detail"></div>;
   document.getElementById('pg-mensal').innerHTML=h;
   renderMes(0);
 }
@@ -349,21 +347,21 @@ function renderMesTotal(){
     <div class="cd"><div class="ct">Receitas & Cartões — Total Anual</div><table>
       <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
       <tr><td>Salário</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_salario||0),0))}</td></tr>
-      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0)>0?`<tr><td>Dividendos</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0))}</td></tr>`:''}
+      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0)>0?<tr><td>Dividendos</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_dividendos||0),0))}</td></tr>:''}
       <tr><td>PJ Andressa</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_pj_andressa||0),0))}</td></tr>
-      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0)>0?`<tr><td>Outros</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0))}</td></tr>`:''}
+      ${MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0)>0?<tr><td>Outros</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.rec_outros||0),0))}</td></tr>:''}
       <tr class="tr"><td>Total Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
     </table><hr><table>
       <tr><td>Cartão Itaú</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_itau||0),0))}</td></tr>
       <tr><td>Cartão XP</td><td class="num">${fmt(MESES.reduce((s,m)=>s+parseFloat(m.cart_xp||0),0))}</td></tr>
       <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(tC)}</td></tr>
     </table>
-    ${Object.keys(vmap).length?`<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${Object.entries(vmap).sort((a,b)=>b[1]-a[1]).map(([d,v])=>`<tr><td>${d}</td><td class="num">${fmt(v)}</td></tr>`).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(tV)}</td></tr></table>`:''}
+    ${Object.keys(vmap).length?<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${Object.entries(vmap).sort((a,b)=>b[1]-a[1]).map(([d,v])=><tr><td>${d}</td><td class="num">${fmt(v)}</td></tr>).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(tV)}</td></tr></table>:''}
     <hr>
     <table style="margin-bottom:8px">
       <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(tC)}</td></tr>
       <tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(tV)}</td></tr>
-      ${tFe2>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(tFe2)}</td></tr>`:''}
+      ${tFe2>0?<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(tFe2)}</td></tr>:''}
       <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(tF)}</td></tr>
       <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
       <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(tR)}</td></tr>
@@ -373,7 +371,7 @@ function renderMesTotal(){
     </div></div>
     <div class="cd"><div class="ct">Fixos acumulados</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Total</th><th style="text-align:right">Média/mês</th></tr>
-      ${fixSorted.map(([n,v])=>`<tr><td>${n}</td><td class="num">${fmt(v)}</td><td class="num" style="color:var(--t3)">${fmt(v/MESES.length)}</td></tr>`).join('')}
+      ${fixSorted.map(([n,v])=><tr><td>${n}</td><td class="num">${fmt(v)}</td><td class="num" style="color:var(--t3)">${fmt(v/MESES.length)}</td></tr>).join('')}
       <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(tF)}</td><td class="num neg" style="color:var(--t3)">${fmt(tF/MESES.length)}/mês</td></tr>
     </table></div>
   </div>`;
@@ -394,22 +392,22 @@ function renderMes(i){
   let h=`<div class="g2">
     <div class="cd"><div class="ct">Receitas & Cartões — ${m.mes}</div><table>
       <tr><th>Fonte</th><th style="text-align:right">Valor</th></tr>
-      ${+m.rec_salario?`<tr><td>Salário</td><td class="num">${fmt(+m.rec_salario)}</td></tr>`:''}
-      ${+m.rec_dividendos?`<tr><td>Dividendos</td><td class="num">${fmt(+m.rec_dividendos)}</td></tr>`:''}
-      ${+m.rec_pj_andressa?`<tr><td>PJ Andressa</td><td class="num">${fmt(+m.rec_pj_andressa)}</td></tr>`:''}
-      ${+m.rec_outros?`<tr><td>Outros</td><td class="num">${fmt(+m.rec_outros)}</td></tr>`:''}
+      ${+m.rec_salario?<tr><td>Salário</td><td class="num">${fmt(+m.rec_salario)}</td></tr>:''}
+      ${+m.rec_dividendos?<tr><td>Dividendos</td><td class="num">${fmt(+m.rec_dividendos)}</td></tr>:''}
+      ${+m.rec_pj_andressa?<tr><td>PJ Andressa</td><td class="num">${fmt(+m.rec_pj_andressa)}</td></tr>:''}
+      ${+m.rec_outros?<tr><td>Outros</td><td class="num">${fmt(+m.rec_outros)}</td></tr>:''}
       <tr class="tr"><td>Total Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
     </table><hr><table>
       <tr><td>Cartão Itaú</td><td class="num">${fmt(+m.cart_itau)}</td></tr>
       <tr><td>Cartão XP</td><td class="num">${fmt(+m.cart_xp)}</td></tr>
       <tr class="tr"><td>Total Cartões</td><td class="num neg">${fmt(+m.cart_total)}</td></tr>
     </table>
-    ${viaM.length?`<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${viaM.map(v=>`<tr><td>${v.destino}</td><td class="num">${fmt(+v.valor)}</td></tr>`).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(+m.viagens_total)}</td></tr></table>`:''}
+    ${viaM.length?<hr><table><tr><th>Viagens</th><th style="text-align:right">Valor</th></tr>${viaM.map(v=><tr><td>${v.destino}</td><td class="num">${fmt(+v.valor)}</td></tr>).join('')}<tr class="tr"><td>Total Viagens</td><td class="num neg">${fmt(+m.viagens_total)}</td></tr></table>:''}
     <hr>
     <table style="margin-bottom:8px">
       <tr><td style="color:var(--t2)">Cartões</td><td class="num">${fmt(+m.cart_total)}</td></tr>
-      ${viaM.length?`<tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(+m.viagens_total)}</td></tr>`:''}
-      ${+(m.festa_total||0)>0?`<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(+(m.festa_total||0))}</td></tr>`:''}
+      ${viaM.length?<tr><td style="color:var(--t2)">Viagens</td><td class="num">${fmt(+m.viagens_total)}</td></tr>:''}
+      ${+(m.festa_total||0)>0?<tr><td style="color:var(--t2)">Festas dos Filhos</td><td class="num">${fmt(+(m.festa_total||0))}</td></tr>:''}
       <tr><td style="color:var(--t2)">Fixos & Serviços</td><td class="num">${fmt(+m.fixos_total)}</td></tr>
       <tr class="tr"><td>Despesas totais</td><td class="num neg">${fmt(tot)}</td></tr>
       <tr class="tr"><td>Receitas</td><td class="num pos">${fmt(+m.rec_total)}</td></tr>
@@ -419,7 +417,7 @@ function renderMes(i){
     </div></div>
     <div class="cd"><div class="ct">Fixos — ${m.mes}</div><table>
       <tr><th>Descrição</th><th style="text-align:right">Valor</th></tr>
-      ${fixM.map(f=>`<tr><td style="${+f.valor===0?'color:var(--t3)':''}">${f.nome}</td><td class="num">${fmt(+f.valor)}</td></tr>`).join('')}
+      ${fixM.map(f=><tr><td style="${+f.valor===0?'color:var(--t3)':''}">${f.nome}</td><td class="num">${fmt(+f.valor)}</td></tr>).join('')}
       <tr class="tr"><td>Total Fixos</td><td class="num neg">${fmt(+m.fixos_total)}</td></tr>
     </table></div>
   </div>`;
@@ -464,20 +462,20 @@ function buildCategorias() {
   const mx=cats[0]?.[1].total||1;
   const cores=['#1A5C3A','#2D7A4F','#C8973A','#D4A84E','#0D3B6E','#1A5C8A','#8B1A1A','#A03333','#4A7C59','#6BBF8E','#7A4E0D','#9B6A2A','#2A4A7A','#5A7A3A','#7A2A5A'];
 
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Gastos por categoria</div><div class="ss">cartões Itaú + XP</div></div>`;
-  h+=`<div class="cd" style="margin-bottom:14px"><div class="ct">Top 6 — evolução mensal</div><div class="cw" style="height:280px"><canvas id="cCat"></canvas></div></div>`;
-  h+=`<div class="g2"><div class="cd"><div class="ct">Ranking acumulado</div>`;
+  let h=<div class="sh" style="margin-top:1rem"><div class="st">Gastos por categoria</div><div class="ss">cartões Itaú + XP</div></div>;
+  h+=<div class="cd" style="margin-bottom:14px"><div class="ct">Top 6 — evolução mensal</div><div class="cw" style="height:280px"><canvas id="cCat"></canvas></div></div>;
+  h+=<div class="g2"><div class="cd"><div class="ct">Ranking acumulado</div>;
   cats.forEach(([n,v],i)=>{
-    h+=`<div class="br-row"><span class="br-l" style="min-width:150px;font-size:11px">${n}</span><div class="br-t"><div class="br-f" style="width:${(v.total/mx*100).toFixed(1)}%;background:${cores[i%cores.length]}"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v.total)}</span></div>`;
+    h+=<div class="br-row"><span class="br-l" style="min-width:150px;font-size:11px">${n}</span><div class="br-t"><div class="br-f" style="width:${(v.total/mx*100).toFixed(1)}%;background:${cores[i%cores.length]}"></div></div><span style="min-width:70px;text-align:right;font-size:12px;font-weight:500">${fK(v.total)}</span></div>;
   });
-  h+=`</div></div>`;
+  h+=</div></div>;
   // Tabela comparativa full-width
   h+=`<div class="cd" style="margin-top:14px"><div class="ct">Tabela comparativa <span style="color:var(--t3);font-weight:400">(R$ arredondado)</span></div>
   <div style="overflow-x:auto">
   <table style="border-collapse:collapse;width:100%;white-space:nowrap">
     <thead><tr style="border-bottom:2px solid var(--bd)">
       <th style="text-align:left;padding:8px 16px 8px 0;font-size:10px;color:var(--t3);letter-spacing:.06em;min-width:150px">CATEGORIA</th>
-      ${mesesNomes.map(mn=>`<th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--t3);letter-spacing:.06em">${mn.slice(0,3).toUpperCase()}</th>`).join('')}
+      ${mesesNomes.map(mn=><th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--t3);letter-spacing:.06em">${mn.slice(0,3).toUpperCase()}</th>).join('')}
       <th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--t);letter-spacing:.06em;border-left:2px solid var(--bd)">TOTAL</th>
       <th style="text-align:right;padding:8px 0 8px 10px;font-size:10px;color:var(--t3);letter-spacing:.06em">MÉDIA</th>
     </tr></thead>
@@ -488,7 +486,7 @@ function buildCategorias() {
     const bg = i%2===0?'var(--s2)':'var(--s)';
     h+=`<tr style="background:${bg};border-bottom:1px solid var(--bd)">
       <td style="padding:8px 16px 8px 0;font-size:12px;font-weight:500">${n}</td>
-      ${mesesNomes.map(mn=>`<td style="text-align:right;padding:8px 10px;font-size:12px;color:${(v[mn]||0)===0?'#ccc':'var(--t)'}">${fN(v[mn]||0)}</td>`).join('')}
+      ${mesesNomes.map(mn=><td style="text-align:right;padding:8px 10px;font-size:12px;color:${(v[mn]||0)===0?'#ccc':'var(--t)'}">${fN(v[mn]||0)}</td>).join('')}
       <td style="text-align:right;padding:8px 10px;font-size:12px;font-weight:700;border-left:2px solid var(--bd)">${fN(v.total)}</td>
       <td style="text-align:right;padding:8px 0 8px 10px;font-size:12px;color:var(--t2)">${fN(media)}</td>
     </tr>`;
@@ -498,11 +496,11 @@ function buildCategorias() {
   const grandMedia=grandTotal/mesesNomes.length;
   h+=`<tr style="border-top:2px solid var(--t);font-weight:700;background:var(--s)">
     <td style="padding:10px 16px 10px 0;font-size:12px">TOTAL</td>
-    ${totRow.map(v=>`<td style="text-align:right;padding:10px;font-size:12px">${fN(v)}</td>`).join('')}
+    ${totRow.map(v=><td style="text-align:right;padding:10px;font-size:12px">${fN(v)}</td>).join('')}
     <td style="text-align:right;padding:10px;font-size:12px;border-left:2px solid var(--bd)">${fN(grandTotal)}</td>
     <td style="text-align:right;padding:10px 0 10px 10px;font-size:12px;color:var(--t2)">${fN(grandMedia)}</td>
   </tr>`;
-  h+=`</tbody></table></div></div>`;
+  h+=</tbody></table></div></div>;
   document.getElementById('pg-categorias').innerHTML=h;
 
   const top6=cats.slice(0,6);
@@ -519,9 +517,9 @@ function buildTransferencias() {
   const mesesNomes=['Todos',...new Set(PIX.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
   const cats=['Todas',...new Set(PIX.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
 
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Transferências & PIX</div><div class="ss" id="transf-cnt"></div></div>`;
+  let h=<div class="sh" style="margin-top:1rem"><div class="st">Transferências & PIX</div><div class="ss" id="transf-cnt"></div></div>;
   h+=`<div class="filter-row">
-    <select class="sel" id="transf-mf" onchange="transfMesF=this.value;renderTransf()">${mesesNomes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
+    <select class="sel" id="transf-mf" onchange="transfMesF=this.value;renderTransf()">${mesesNomes.map(m=><option value="${m}">${m}</option>).join('')}</select>
     <select class="sel" id="transf-pf" onchange="transfPortF=this.value;renderTransf()"><option value="Todos">Todos portadores</option><option value="Luis">Luis</option><option value="Andressa">Andressa</option></select>
     <input type="text" class="search-input" id="transf-q" placeholder="Buscar..." oninput="renderTransf()">
   </div>`;
@@ -539,7 +537,7 @@ function renderTransf() {
   if(transfPortF!=='Todos')f=f.filter(t=>t.portador===transfPortF);
   if(q)f=f.filter(t=>t.estabelecimento.toLowerCase().includes(q));
   const tot=f.reduce((s,t)=>s+parseFloat(t.valor),0);
-  document.getElementById('transf-cnt').textContent=`${f.length} transferências — Total: ${fmt(tot)}`;
+  document.getElementById('transf-cnt').textContent=${f.length} transferências — Total: ${fmt(tot)};
   document.getElementById('transf-tb').innerHTML=f.slice(0,400).map((t,i)=>{
     const bg=i%2===0?'var(--s2)':'var(--s)';
     return `<tr style="background:${bg}">
@@ -554,19 +552,25 @@ function renderTransf() {
 }
 
 // ── LANÇAMENTOS ───────────────────────────────────────────────
+let txMesF='Todos', txCatF='Todas', txTipoF='Todos';
 function buildLancamentos() {
-  const TXC = TX.filter(t=>t.tipo==='cartao');
-  const mesesNomes=['Todos',...new Set(TXC.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
-  const cats=['Todas',...new Set(TXC.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
+  const allMeses=['Todos',...new Set(TX.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
+  const allCats=['Todas',...new Set(TX.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
 
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Lançamentos</div><div class="ss" id="tx-cnt"></div></div>`;
+  let h=<div class="sh" style="margin-top:1rem"><div class="st">Lançamentos</div><div class="ss" id="tx-cnt"></div></div>;
   h+=`<div class="filter-row">
-    <select class="sel" id="tx-mf" onchange="txMesF=this.value;renderTx()">${mesesNomes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
-    <select class="sel" id="tx-cf" onchange="txCatF=this.value;renderTx()">${cats.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-    <input type="text" class="search-input" id="tx-q" placeholder="Buscar estabelecimento..." oninput="renderTx()">
+    <select class="sel" id="tx-mf" onchange="txMesF=this.value;renderTx()">${allMeses.map(m=><option value="${m}">${m}</option>).join('')}</select>
+    <select class="sel" id="tx-tf" onchange="txTipoF=this.value;renderTx()">
+      <option value="Todos">Todos os tipos</option>
+      <option value="cartao">Cartão</option>
+      <option value="pix">PIX</option>
+      <option value="debito">Débito automático</option>
+    </select>
+    <select class="sel" id="tx-cf" onchange="txCatF=this.value;renderTx()">${allCats.map(c=><option value="${c}">${c}</option>).join('')}</select>
+    <input type="text" class="search-input" id="tx-q" placeholder="Buscar..." oninput="renderTx()">
   </div>`;
   h+=`<div class="cd" style="max-height:550px;overflow-y:auto"><table><thead style="position:sticky;top:0;background:var(--s)">
-    <tr><th>Data</th><th>Estabelecimento</th><th>Categoria</th><th>Cartão</th><th style="text-align:right">Valor</th></tr>
+    <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Origem</th><th style="text-align:right">Valor</th></tr>
   </thead><tbody id="tx-tb"></tbody></table></div>`;
   document.getElementById('pg-lancamentos').innerHTML=h;
   renderTx();
@@ -574,19 +578,23 @@ function buildLancamentos() {
 
 function renderTx() {
   const q=(document.getElementById('tx-q')?.value||'').toLowerCase();
-  let f=TX.filter(t=>t.tipo==='cartao');
+  let f=TX.filter(t=>+t.valor>0);
   if(txMesF!=='Todos')f=f.filter(t=>t.mes===txMesF);
+  if(txTipoF!=='Todos')f=f.filter(t=>t.tipo===txTipoF);
   if(txCatF!=='Todas')f=f.filter(t=>t.categoria===txCatF);
   if(q)f=f.filter(t=>t.estabelecimento.toLowerCase().includes(q));
+  f.sort((a,b)=>parseFloat(b.valor)-parseFloat(a.valor));
   const tot=f.reduce((s,t)=>s+parseFloat(t.valor),0);
-  document.getElementById('tx-cnt').textContent=`${f.length} lançamentos — Total: ${fmt(tot)}`;
-  document.getElementById('tx-tb').innerHTML=f.slice(0,300).map((t,i)=>{
+  document.getElementById('tx-cnt').textContent=${f.length} lançamentos — Total: ${fmt(tot)};
+  const tipoLabel=t=>t.tipo==='cartao'?Cartão ${t.cartao}:t.tipo==='pix'?PIX ${t.cartao}:Débito ${t.cartao};
+  const tipoColor=t=>t.tipo==='cartao'?'var(--bl)':t.tipo==='pix'?'var(--g)':'var(--a)';
+  document.getElementById('tx-tb').innerHTML=f.slice(0,500).map((t,i)=>{
     const bg=i%2===0?'var(--s2)':'var(--s)';
     return `<tr style="background:${bg}">
       <td style="font-size:11px;white-space:nowrap">${t.data}</td>
       <td style="font-size:11px">${t.estabelecimento}</td>
-      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\\'")}',this)" title="Clique para alterar">${t.categoria} ✎</span></td>
-      <td style="font-size:11px">${t.cartao}</td>
+      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\'")}',this)" title="Clique para alterar">${t.categoria} ✎</span></td>
+      <td style="font-size:11px;color:${tipoColor(t)};font-weight:500">${tipoLabel(t)}</td>
       <td class="num" style="font-size:11px;font-weight:500">${fmt(parseFloat(t.valor))}</td>
     </tr>`;
   }).join('');
@@ -597,15 +605,15 @@ async function editCat(id, catAtual, el) {
   const sel=document.createElement('select');
   sel.className='cat-sel';
   allCats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===catAtual)o.selected=true;sel.appendChild(o);});
-  const nova=document.createElement('option');nova.value='__nova__';nova.textContent='+ Nova...';sel.appendChild(nova);
+  const nova=document.createElement('option');nova.value='_nova_';nova.textContent='+ Nova...';sel.appendChild(nova);
   el.replaceWith(sel);
   sel.focus();
   sel.onchange=async()=>{
     let val=sel.value;
-    if(val==='__nova__'){val=prompt('Nome da nova categoria:');if(!val){renderTx();return;}}
+    if(val==='_nova_'){val=prompt('Nome da nova categoria:');if(!val){renderTx();return;}}
     const estab=TX.find(t=>t.id===id)?.estabelecimento;
     const {error}=await sb.from('transacoes').update({categoria:val}).eq('estabelecimento',estab);
-    if(!error){TX.forEach(t=>{if(t.estabelecimento===estab)t.categoria=val;});showToast(`${estab} → ${val}`);renderTx();buildCategorias();}
+    if(!error){TX.forEach(t=>{if(t.estabelecimento===estab)t.categoria=val;});showToast(${estab} → ${val});renderTx();buildCategorias();}
     else showToast('Erro ao salvar');
   };
 }
