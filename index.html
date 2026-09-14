@@ -510,46 +510,6 @@ function buildCategorias() {
 }
 
 
-// ── TRANSFERÊNCIAS (PIX) ──────────────────────────────────────
-let transfMesF='Todos', transfPortF='Todos';
-function buildTransferencias() {
-  const PIX = TX.filter(t=>t.tipo==='pix');
-  const mesesNomes=['Todos',...new Set(PIX.map(t=>t.mes))].sort((a,b)=>a==='Todos'?-1:0);
-  const cats=['Todas',...new Set(PIX.map(t=>t.categoria))].sort((a,b)=>a==='Todas'?-1:0);
-
-  let h=`<div class="sh" style="margin-top:1rem"><div class="st">Transferências & PIX</div><div class="ss" id="transf-cnt"></div></div>`;
-  h+=`<div class="filter-row">
-    <select class="sel" id="transf-mf" onchange="transfMesF=this.value;renderTransf()">${mesesNomes.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
-    <select class="sel" id="transf-pf" onchange="transfPortF=this.value;renderTransf()"><option value="Todos">Todos portadores</option><option value="Luis">Luis</option><option value="Andressa">Andressa</option></select>
-    <input type="text" class="search-input" id="transf-q" placeholder="Buscar..." oninput="renderTransf()">
-  </div>`;
-  h+=`<div class="cd" style="max-height:550px;overflow-y:auto"><table><thead style="position:sticky;top:0;background:var(--s)">
-    <tr><th>Data</th><th>Descrição</th><th>Conta</th><th>Quem pagou</th><th>Categoria</th><th style="text-align:right">Valor</th></tr>
-  </thead><tbody id="transf-tb"></tbody></table></div>`;
-  document.getElementById('pg-transferencias').innerHTML=h;
-  renderTransf();
-}
-
-function renderTransf() {
-  const q=(document.getElementById('transf-q')?.value||'').toLowerCase();
-  let f=TX.filter(t=>t.tipo==='pix');
-  if(transfMesF!=='Todos')f=f.filter(t=>t.mes===transfMesF);
-  if(transfPortF!=='Todos')f=f.filter(t=>t.portador===transfPortF);
-  if(q)f=f.filter(t=>t.estabelecimento.toLowerCase().includes(q));
-  const tot=f.reduce((s,t)=>s+parseFloat(t.valor),0);
-  document.getElementById('transf-cnt').textContent=`${f.length} transferências — Total: ${fmt(tot)}`;
-  document.getElementById('transf-tb').innerHTML=f.slice(0,400).map((t,i)=>{
-    const bg=i%2===0?'var(--s2)':'var(--s)';
-    return `<tr style="background:${bg}">
-      <td style="font-size:11px;white-space:nowrap">${t.data}</td>
-      <td style="font-size:11px">${t.estabelecimento}</td>
-      <td style="font-size:11px">${t.cartao||'—'}</td>
-      <td style="font-size:11px">${t.portador||'—'}</td>
-      <td style="font-size:10px"><span class="cat-badge" onclick="editCat(${t.id},'${t.categoria.replace(/'/g,"\\'")}',this)" title="Clique para alterar">${t.categoria} ✎</span></td>
-      <td class="num" style="font-size:11px;font-weight:500">${fmt(parseFloat(t.valor))}</td>
-    </tr>`;
-  }).join('');
-}
 
 // ── LANÇAMENTOS ───────────────────────────────────────────────
 let txMesF='Todos', txCatF='Todas', txTipoF='Todos';
